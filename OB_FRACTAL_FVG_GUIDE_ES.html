@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OB Fractal FVG + CVD — Guía Técnica y Plan de Trading</title>
+    <style>
+        :root {
+            --green: #16a34a;
+            --green-light: #86efac;
+            --red: #dc2626;
+            --orange: #ea580c;
+            --blue: #2563eb;
+            --gray: #6b7280;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --border: #d1d5db;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--light); color: var(--dark); line-height: 1.6; max-width: 1000px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, var(--green), var(--orange)); color: white; padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px; }
+        header h1 { font-size: 1.8em; margin-bottom: 10px; }
+        header p { font-size: 1.05em; opacity: 0.9; }
+        section { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h2 { color: var(--green); border-bottom: 2px solid var(--green); padding-bottom: 8px; margin-bottom: 15px; font-size: 1.3em; }
+        h3 { color: var(--dark); margin: 15px 0 10px; font-size: 1.1em; }
+        h4 { color: var(--orange); margin: 10px 0 5px; font-size: 1em; }
+        ul { padding-left: 20px; margin: 10px 0; }
+        li { margin-bottom: 6px; }
+        .term-box { background: #f0fdf4; border-left: 4px solid var(--green); padding: 12px 16px; margin: 10px 0; border-radius: 0 6px 6px 0; }
+        .term-box.bearish { background: #fef2f2; border-left-color: var(--red); }
+        .term-box.orange { background: #fff7ed; border-left-color: var(--orange); }
+        .term-box.blue { background: #eff6ff; border-left-color: var(--blue); }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-left: 5px; }
+        .badge-bull { background: var(--green); color: white; }
+        .badge-bear { background: var(--red); color: white; }
+        .badge-blue { background: var(--blue); color: white; }
+        .badge-orange { background: var(--orange); color: white; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+        th { background: var(--dark); color: white; }
+        tr:nth-child(even) { background: #f9fafb; }
+        .code-block { background: #1f2937; color: #e5e7eb; padding: 15px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto; margin: 10px 0; }
+        .plan-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 20px; margin: 15px 0; }
+        .plan-box h4 { color: #1d4ed8; }
+        .divider { height: 1px; background: var(--border); margin: 20px 0; }
+        .footer { text-align: center; color: var(--gray); padding: 20px; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>OB Fractal FVG + CVD — Guía Técnica</h1>
+        <p>Order Blocks • Fair Value Gaps • Fractals • Break of Structure • Volumen Delta Acumulado</p>
+        <p>Indicadores Pine Script para TradingView</p>
+    </header>
+
+    <section>
+        <h2>Introducción</h2>
+        <p>Dos indicadores complementarios forman este sistema de trading:</p>
+        <ol>
+            <li><strong>OB Fractal FVG</strong> (superposición, pane de precios): Detecta Order Blocks, Fair Value Gaps, Fractals y Break of Structure directamente en el gráfico de precios.</li>
+            <li><strong>CVD por Delta de Tamaño USDT</strong> (pane separado): Indicador de Volumen Delta Acumulado con clasificación de acción por barra (BULL, BEAR, ABSb, ABSs), tabla winsorizada y flechas de absorción.</li>
+        </ol>
+        <p>El CVD proporciona confirmación de flujo que complementa las señales estructurales de OB Fractal FVG.</p>
+    </section>
+
+    <section>
+        <h2>OB Fractal FVG — Términos Técnicos</h2>
+
+        <h3>Order Block (OB) <span class="badge badge-bull">Alcista</span><span class="badge badge-bear">Bajista</span></h3>
+        <table>
+            <tr><th>Término</th><th>Definición</th></tr>
+            <tr><td>Reversión de 2 Velas</td><td>Patrón de engulfing bajista: barra[2] es una vela bajista, barra[1] es una vela alcista que cierra por encima del máximo de la barra[2]. Para OB bajista: barra[2] es alcista, barra[1] es bajista cerrando por debajo del mínimo de la barra[2].</td></tr>
+            <tr><td>Contención de Cuerpo</td><td>El cuerpo de la vela de reacción contiene completamente el cuerpo de la vela anterior (prevBodyTop <= reactBodyTop Y prevBodyBottom >= reactBodyBottom).</td></tr>
+            <tr><td>Condición de Undercut</td><td>Alternativa a la contención de cuerpo: el mínimo de la barra de reacción (low[1]) está por debajo del mínimo de la barra bajista anterior (low[2]), indicando una ruptura falsa antes del rebote.</td></tr>
+            <tr><td>Vela de Reacción</td><td>Barra[1] — la vela que reacciona y rompe por encima/por debajo de la barra anterior, confirmando el OB.</td></tr>
+            <tr><td>Cierre en Top/Bottom 10%</td><td>El cierre de la vela de reacción está dentro del 10% superior (alcista) o 10% inferior (bajista) del rango de esa vela.</td></tr>
+            <tr><td>Confirmación Fractal</td><td>Debe existir un fractal reciente (máximo o mínimo) dentro de las últimas 5 barras cerca del OB para validez.</td></tr>
+            <tr><td>Mitigación</td><td>Cuando el precio entra en la zona OB: mitigación completa si low <= bottom (alcista) o high >= top (bajista); mitigación parcial si el precio toca pero no entra completamente.</td></tr>
+            <tr><td>Congelamiento (Freezing)</td><td>Cuando se mitiga completamente, el rectángulo OB deja de extenderse hacia la derecha y se torna gris, marcándolo como "usado".</td></tr>
+            <tr><td>Extensión Izquierda</td><td>Los rectángulos OB se extienden hacia la izquierda para incluir velas consecutivas de la misma dirección cuyos cuerpos están contenidos dentro del rango del cuerpo de la vela de reacción (hasta 20 barras atrás).</td></tr>
+            <tr><td>Etiqueta dentro de OB</td><td>Una etiqueta de texto "OB" se coloca en el centro vertical de cada rectángulo de order block, reubicándose cada barra a medida que el rectángulo se extiende.</td></tr>
+        </table>
+
+        <h3>Fair Value Gap (FVG) <span class="badge badge-bull">Alcista</span><span class="badge badge-bear">Bajista</span></h3>
+        <table>
+            <tr><th>Término</th><th>Definición</th></tr>
+            <tr><td>Desequilibrio de 3 Velas</td><td>Alcista: high[3] < low[1] (hueco al alza entre barra[3] y barra[1]). Bajista: low[3] > high[1] (hueco a la baja). La barra[2] es la vela intermedia.</td></tr>
+            <tr><td>Línea de Nivel 50%</td><td>Una línea discontinua naranja dibujada en el punto medio del rango FVG, extendiéndose a la derecha hasta que el precio la toca.</td></tr>
+            <tr><td>Extensión FVG</td><td>El rectángulo FVG se extiende a la derecha en cada barra hasta que se mitiga (el precio entra en el rango del hueco). Cuando se mitiga, se congela y se elimina la línea del 50%.</td></tr>
+            <tr><td>Mitigación FVG</td><td>Alcista: low <= bottom del FVG (high[3]). Bajista: high >= top del FVG (low[3]).</td></tr>
+        </table>
+
+        <h3>Fractal y Break of Structure (BOS)</h3>
+        <table>
+            <tr><th>Término</th><th>Definición</th></tr>
+            <tr><td>Fractal de Williams</td><td>Un patrón de 5 barras (n=2 barras a la izquierda, configurable) donde la barra central tiene el máximo más alto (fractal alcista) o el mínimo más bajo (fractal bajista) de las 5 barras.</td></tr>
+            <tr><td>Gestión de Frente</td><td>Administra extremos duplicados en el frente del patrón usando comparaciones estrictas (>=, <=) y no estrictas (<, >) para evitar falsos positivos.</td></tr>
+            <tr><td>Ventana de Fractal Reciente</td><td>Los fractales dentro de las últimas 5 barras se consideran "recientes" y se usan para confirmación.</td></tr>
+            <tr><td>BOS Alcista</td><td>El cierre rompe un máximo fractal previo, con el cierre anterior por debajo de ese máximo fractal.</td></tr>
+            <tr><td>BOS Bajista</td><td>El cierre rompe un mínimo fractal previo, con el cierre anterior por encima de ese mínimo fractal.</td></tr>
+            <tr><td>Resaltado de Fondo BOS</td><td>Verde (85% transparente) para BOS alcista, rojo (85% transparente) para BOS bajista.</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>CVD (Cumulative Delta Volume) — Términos Técnicos</h2>
+
+        <h3>Conceptos de Flujo Básicos</h3>
+        <table>
+            <tr><th>Término</th><th>Definición</th></tr>
+            <tr><td>Delta de USDT</td><td>Delta por barra = buy_vol - sell_vol, donde buy_vol y sell_vol se dividen por la posición del cierre en el rango de la barra: buy_vol = usd * (close - low) / rng; sell_vol = usd - buy_vol. Acotado a [0, usd] para que el delta neto sea siempre significativo.</td></tr>
+            <tr><td>Total CVD Acumulado</td><td>Suma acumulativa de delta, añadido solo en barras confirmadas (<code>barstate.isconfirmed</code>) para evitar ruido en tiempo real. Representado como un área verde/roja cerca de cero.</td></tr>
+            <tr><td>EMA de Delta (Momentum)</td><td>EMA de 20 períodos del delta por barra, representada como un gráfico de área. Verde cuando es positiva (momento comprador), roja cuando es negativa (momento vendedor).</td></tr>
+            <tr><td>Verificación OBV</td><td>El delta sintético debe estar de acuerdo con la dirección real del cierre (close > close[1] = OBV sube) antes de clasificar como BULL o BEAR. Previene divergencias entre flujo de volumen y acción de precios.</td></tr>
+            <tr><td>Escala Winsorizada</td><td>Las columnas de la tabla se escalan usando el percentil 95 de la magnitud, de modo que una barra atípica no pueda opacar la intensidad de color del resto.</td></tr>
+        </table>
+
+        <h3>Clasificación de Palabras de Acción <span class="badge badge-bull">BULL</span><span class="badge badge-bear">BEAR</span><span class="badge badge-blue">ABSb</span><span class="badge badge-orange">ABSs</span></h3>
+        <table>
+            <tr><th>Palabra de Acción</th><th>Condiciones</th><th>Significado</th></tr>
+            <tr><td>BULL</td><td>delta > 0 Y buy_vol > sell_vol Y cierre en mitad superior Y sin máxima superior larga Y OBV confirma alza</td><td>Presión alcista clara en esta barra — el flujo de compra dominó.</td></tr>
+            <tr><td>BEAR</td><td>delta < 0 Y sell_vol > buy_vol Y cierre en mitad inferior Y OBV confirma baja</td><td>Presión bajista clara en esta barra — el flujo de venta dominó.</td></tr>
+            <tr><td>ABSb</td><td>delta > 0 Y buy_vol > sell_vol Y NO OBV sube Y sin máxima superior larga</td><td>Comprador oculto en una barra bajista — la presión de compra absorbió la venta, el precio puede rebotar.</td></tr>
+            <tr><td>ABSs</td><td>delta < 0 Y sell_vol > buy_vol Y OBV sube</td><td>Vendedor oculto en una barra alcista — la presión de venta absorbió la compra, el precio puede caer.</td></tr>
+            <tr><td>FLAT</td><td>Ninguna de las condiciones anteriores se cumple</td><td>Flujo indeterminado — sin convicción clara.</td></tr>
+            <tr><td>Confirmación de 2 Barras</td><td>BULL/BEAR requieren dos barras consecutivas de la misma dirección para activarse; ABSb/ABSs se disparan en la primera barra (su propósito es capturar la contradicción inmediata)</td><td>BULL/BEAR confirma persistencia; ABSb/ABSs captura el flujo de reversión inmediato.</td></tr>
+        </table>
+
+        <h3>Umbrales de Wick y Posición de Cierre</h3>
+        <table>
+            <tr><th>Entrada</th><th>Valor por Defecto</th><th>Propósito</th></tr>
+            <tr><td>Wick Min Ratio</td><td>0.6 (60%)</td><td>El wick de una barra debe ser >= 60% del rango total para contar como un "wick sweep" (rechaza señales falsas con wicks excesivos).</td></tr>
+            <tr><td>Close Min Threshold</td><td>0.5 (punto medio)</td><td>La barra debe cerrar en la mitad superior (alcista) o mitad inferior (bajista) de su rango. Ajustable: 0.5 = punto medio, 0.95 = muy cerca del extremo.</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>OB Fractal FVG — Características y Ventajas</h2>
+        <ul>
+            <li><strong>Validación de Triple Confluencia:</strong> Combina OB, FVG y Fractal/BOS en un sistema de confluencia único — mayor fiabilidad de señales que cualquier indicador individual.</li>
+            <li><strong>Mapeo Zonal Visual:</strong> Rectángulos coloreados con etiquetas (OB, FVG) proporcionan referencia visual clara de zonas clave de oferta/demanda en todo momento.</li>
+            <li><strong>Extensión Dinámica:</strong> Los rectángulos OB y FVG se extienden hacia la derecha en tiempo real hasta que se mitigan, manteniendo las zonas "vivas" y relevantes.</li>
+            <li><strong>Retroalimentación de Mitigación:</strong> El coloreado gris en zonas mitigadas proporciona retroalimentación visual clara sobre qué zonas han sido "usadas" y cuáles siguen válidas.</li>
+            <li><strong>Líneas de Nivel 50% FVG:</strong> Línea discontinua naranja del 50% proporciona un nivel preciso de entrada/referencia dentro de las zonas FVG.</li>
+            <li><strong>Filtro de Confluencia Fractal:</strong> La detección de BOS mediante Fractales de Williams añade confirmación estructural, reduciendo señales falsas de OB/FVG.</li>
+            <li><strong>Condición de Undercut:</strong> Los OBs alcistas también son válidos cuando el mínimo de la barra de reacción está por debajo del mínimo de la barra bajista anterior — captura rupturas falsas.</li>
+            <li><strong>Etiquetas OB:</strong> Etiquetas "OB" posicionadas en el centro del rectángulo y reubicadas cada barra a medida que los rectángulos se extienden.</li>
+            <li><strong>Sin Repintado:</strong> La detección usa lógica de barras confirmadas (<code>barstate.isconfirmed or not barstate.isrealtime</code>).</li>
+            <li><strong>Configurable:</strong> Active/desactive componentes individuales (OB, FVG, BOS, fractales) mediante entradas.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>CVD — Características y Ventajas</h2>
+        <ul>
+            <li><strong>Delta Basado en USDT:</strong> Delta calculado de USDT volume * close, dividido por la posición del cierre en el rango de la barra — sin depender del volumen de monedas crudas.</li>
+            <li><strong>Clasificación de Palabras de Acción:</strong> Cada barra clasificada como BULL, BEAR, ABSb, ABSs o FLAT con significado visual claro.</li>
+            <li><strong>Puerta de Confirmación de 2 Barras:</strong> Las señales BULL/BEAR requieren dos barras consecutivas confirmadas, reduciendo falsos positivos. ABSb/ABSs se disparan inmediatamente para capturar flujo oculto.</li>
+            <li><strong>Filtro de Acuerdo OBV:</strong> El delta sintético debe estar de acuerdo con la dirección real del cierre antes de la clasificación BULL/BEAR — previene falsas señales de divergencia flujo/precio.</li>
+            <li><strong>Escala Winsorizada de Tabla:</strong> Normalización al percentil 95 previene que una barra atípica opaque la intensidad de color de toda la tabla.</li>
+            <li><strong>Tabla por Barra:</strong> Muestra Hora, Delta Neto, Vol Buy, Vol Sell y palabra de acción para las últimas N barras (configurable, por defecto 20).</li>
+            <li><strong>Flechas de Absorción:</strong> Triángulos azules hacia arriba (abajo) para ABSb, triángulos naranjas hacia abajo (arriba) para ABSs — señales visuales de absorción directamente en el pane CVD.</li>
+            <li><strong>Puerta de Calidad de Wick:</strong> Umbral de wick configurable (por defecto 60%) rechaza barras con wicks excesivos que podrían invalidar la señal.</li>
+            <li><strong>Acumulación Solo Confirmada:</strong> El total CVD solo se acumula en barras <code>barstate.isconfirmed</code>, evitando ruido en tiempo real.</li>
+            <li><strong>EMA de Momentum CVD:</strong> EMA de 20 períodos del delta representada como gráfico de área — muestra dirección y fuerza del momentum de flujo a corto plazo.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Sistema de Trading Combinado — Cómo Trabajan Juntos CVD y OB Fractal FVG</h2>
+        <div class="term-box">
+            <strong>El CVD proporciona confirmación de flujo para operaciones basadas en OB:</strong>
+        </div>
+        <ul>
+            <li><strong>Entrada OB Alcista:</strong> Cuando se detecta un OB alcista con confirmación BOS, verifique el pane CVD — una palabra de acción <span class="badge badge-bull">BULL</span> o <span class="badge badge-blue">ABSb</span> en la barra actual o reciente confirma que el flujo de compra respalda la entrada.</li>
+            <li><strong>Entrada OB Bajista:</strong> Cuando se detecta un OB bajista con confirmación BOS, busque una palabra <span class="badge badge-bear">BEAR</span> o <span class="badge badge-orange">ABSs</span> en la tabla CVD para confirmar el flujo de venta.</li>
+            <li><strong>Filtro de Mitigación de OB:</strong> Si el CVD muestra <span class="badge badge-bear">BEAR</span> o <span class="badge badge-orange">ABSs</span> mientras el precio se acerca a un OB alcista, evite la entrada — el flujo no respalda la zona OB como zona de demanda.</li>
+            <li><strong>Advertencia de Divergencia CVD:</strong> Si el precio hace nuevos máximos pero el delta CVD disminuye (divergencia negativa en la EMA de delta), la zona OB/FVG arriba podría fallar ya que la oferta absorbe la demanda.</li>
+            <li><strong>Regla de Persistencia de 2 Barras:</strong> Use la puerta de confirmación de 2 barras del CVD como filtro adicional — espere dos barras BULL/BEAR consecutivas antes de entrar en una operación basada en OB.</li>
+        </ul>
+        <div class="plan-box">
+            <h4>Ejemplo de Matriz de Confluencia</h4>
+            <table>
+                <tr><th>Señal OB</th><th>Señal BOS</th><th>Palabra Acción CVD</th><th>Presencia FVG</th><th>Decisión</th></tr>
+                <tr><td>OB Alcista</td><td>BOS Alcista confirmado</td><td>BULL o ABSb (2-bar confirmado)</td><td>FVG Alcista alineado</td><td><strong>COMPRA FUERTE</strong> — triple confluencia + alineación FVG</td></tr>
+                <tr><td>OB Alcista</td><td>BOS Alcista confirmado</td><td>BULL (1 barra) o FLAT</td><td>FVG Alcista alineado</td><td><strong>COMPRA CONDICIONAL</strong> — espere confirmación de 2 barras CVD</td></tr>
+                <tr><td>OB Alcista</td><td>BOS Alcista confirmado</td><td>BEAR o ABSs</td><td>Sin FVG</td><td><strong>EVITAR</strong> — el flujo contradice la zona OB</td></tr>
+                <tr><td>OB Bajista</td><td>BOS Bajista confirmado</td><td>BEAR o ABSs (2-bar confirmado)</td><td>FVG Bajista alineado</td><td><strong>VENTA FUERTE</strong> — triple confluencia + alineación FVG</td></tr>
+                <tr><td>OB Bajista</td><td>BOS Bajista confirmado</td><td>BEAR (1 barra) o FLAT</td><td>FVG Bajista alineado</td><td><strong>VENTA CONDICIONAL</strong> — espere confirmación de 2 barras CVD</td></tr>
+                <tr><td>OB Bajista</td><td>BOS Bajista confirmado</td><td>BULL o ABSb</td><td>Sin FVG</td><td><strong>EVITAR</strong> — el flujo contradice la zona OB</td></tr>
+            </table>
+        </div>
+    </section>
+
+    <section>
+        <h2>Plan de Trading — Dos Reglas Simples para Validez de OB</h2>
+
+        <div class="plan-box">
+            <h4>Regla 1: Confirmación de Break of Structure (BOS)</h4>
+            <p>El OB debe ir acompañado de un evento de ruptura de estructura. Un BOS alcista (cierre rompe un máximo fractal reciente) confirma que la estructura del mercado ha cambiado hacia arriba, validando el OB alcista como una potencial zona de soporte. Un BOS bajista (cierre rompe un mínimo fractal reciente) confirma un cambio estructural hacia abajo, validando el OB bajista como una potencial zona de resistencia.</p>
+            <p><strong>Razón:</strong> Sin confirmación BOS, un OB es solo un patrón estructural — carece de la señal de convicción que compradores institucionales (para OB alcista) o vendedores (para OB bajista) están activamente participando.</p>
+        </div>
+
+        <div class="plan-box">
+            <h4>Regla 2: Confirmación de Desequilibrio FVG</h4>
+            <p>Debe existir un desequilibrio FVG a la altura del OB o cercano a él. Un FVG alcista (hueco al alza entre high[3] y low[1]) al mismo nivel que un OB alcista refuerza la zona de demanda. Un FVG bajista (hueco a la baja entre low[3] y high[1]) al mismo nivel que un OB bajista refuerza la zona de oferta.</p>
+            <p><strong>Razón:</strong> El FVG representa una subasta no completada — un nivel de precio donde los participantes del mercado no encontraron equilibrio. Cuando esto se alinea con un Order Block (zona de órdenes institucionales), la confluencia crea un punto de reacción de alta probabilidad.</p>
+        </div>
+
+        <div class="plan-box">
+            <h4>Regla Extra 3 (Filtro CVD): Entrada Confirmada por Flujo</h4>
+            <p>Verifique el pane CVD para confirmación de flujo:</p>
+            <ul>
+                <li>Para entradas OB alcistas: requerir palabra de acción <span class="badge badge-bull">BULL</span> o <span class="badge badge-blue">ABSb</span>, idealmente 2-bar confirmado.</li>
+                <li>Para entradas OB bajistas: requerir palabra de acción <span class="badge badge-bear">BEAR</span> o <span class="badge badge-orange">ABSs</span>, idealmente 2-bar confirmado.</li>
+                <li>Si el CVD muestra flujo opuesto (BEAR para OB alcista, BULL para OB bajista), evite la entrada.</li>
+            </ul>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3>Estrategia de Entrada con Confirmación CVD</h3>
+        <table>
+            <tr><th>Configuración</th><th>Confirmación CVD</th><th>Señal de Entrada</th><th>Stop Loss</th><th>Take Profit</th></tr>
+            <tr>
+                <td>OB Alcista + BOS + FVG + BULL</td>
+                <td>Tabla CVD muestra BULL o ABSb, 2-bar confirmado, EMA delta positiva</td>
+                <td>Entrar a largo cuando el precio reacciona a la zona OB/FVG con rechazo alcista (martillo, envolvente alcista, o rebote en el fondo de la zona)</td>
+                <td>Por debajo de la zona OB/FVG (o por debajo del mínimo reciente)</td>
+                <td>Zona 1: Máximo swing previo. Zona 2: Próxima resistencia estructural. Zona 3: Movimiento medido desde el rango OB.</td>
+            </tr>
+            <tr>
+                <td>OB Bajista + BOS + FVG + BEAR</td>
+                <td>Tabla CVD muestra BEAR o ABSs, 2-bar confirmado, EMA delta negativa</td>
+                <td>Entrar a corto cuando el precio reacciona a la zona OB/FVG con rechazo bajista (disparador, envolvente bajista, o rechazo en la parte superior de la zona)</td>
+                <td>Por encima de la zona OB/FVG (o por encima del máximo reciente)</td>
+                <td>Zona 1: Mínimo swing previo. Zona 2: Próximo soporte estructural. Zona 3: Movimiento medido desde el rango OB.</td>
+            </tr>
+        </table>
+
+        <h3>Estrategia de Salida</h3>
+        <ul>
+            <li><strong>OB/FVG Mitigado:</strong> Cuando el rectángulo OB o FVG se vuelve gris (congelado), la zona ha sido "usada" — considere tomar ganancias parciales o salir.</li>
+            <li><strong>Reversión de Flujo CVD:</strong> Si la palabra de acción del CVD cambia de BULL a BEAR (o viceversa) con confirmación de 2 barras mientras está en una operación, considere reducir o salir — el flujo se está invirtiendo.</li>
+            <li><strong>BOS Opuesto:</strong> Salga cuando el precio active una señal BOS opuesta, indicando un cambio estructural en contra de su posición.</li>
+            <li><strong>Divergencia EMA Delta CVD:</strong> Salga si el precio hace nuevos máximos/mínimos pero la EMA de delta del CVD diverge (no confirma).</li>
+            <li><strong>Próximo OB/FVG:</strong> Salga en la próxima zona de confluencia (nuevo OB o FVG en la dirección de la operación).</li>
+        </ul>
+
+        <h3>Gestión de Riesgo</h3>
+        <ul>
+            <li>Nunca arriesgue más del 1-2% del capital de la cuenta en una sola operación.</li>
+            <li>Siempre use órdenes stop-loss — la zona OB/FVG es el punto de referencia para el stop-loss.</li>
+            <li>Si la zona es superada y el precio cierra más allá con mitigación, salga inmediatamente — la zona falló.</li>
+            <li>Si el CVD muestra FLAT o acción opuesta en la zona OB, reduzca el tamaño de la posición o evite la entrada por completo.</li>
+            <li>Espere re-confirmación (BOS + FVG + flujo CVD) en un nuevo OB antes de entrar en una nueva operación en la misma dirección.</li>
+            <li>En marcos temporales cortos, combine múltiples confluencias OB/FVG; en marcos largos, una sola confluencia fuerte puede ser suficiente.</li>
+        </ul>
+    </section>
+
+    <div class="footer">
+        <p>OB Fractal FVG + CVD Trading System — Guía Técnica y Plan de Trading</p>
+        <p>Pine Script v6 + v5 | Superposición TradingView + Pane Separado | Sistema de Confluencia Basado en Flujo</p>
+    </div>
+</body>
+</html>
