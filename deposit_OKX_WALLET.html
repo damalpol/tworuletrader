@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deposit USDT (BSC)</title>
+  <script src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@4.0.3/dist/web3.min.js"></script>
+  <style>
+    :root{--primary:#10b981;--success:#059669;--bg:#f8f9fc;--card:#ffffff}
+    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);margin:0;padding:20px;min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .container{max-width:420px;width:100%;background:var(--card);padding:32px;border-radius:24px;box-shadow:0 25px 50px rgba(0,0,0,.1);text-align:center;position:relative;overflow:hidden}
+    h1{font-size:28px;margin:0 0 8px;color:#111}
+    p.subtitle{color:#64748b;margin-bottom:16px}
+    #qrcode{margin:24px auto}
+    .address-box{position:relative;background:#f1f5f9;padding:16px;border-radius:16px;font-family:monospace;margin:20px 0;word-break:break-all;font-size:15px;color:#1e40af}
+    .copy-btn{position:absolute;right:10px;top:10px;background:#3b82f6;color:white;border:none;padding:8px 12px;border-radius:10px;cursor:pointer;font-size:13px}
+    .copy-btn:hover{background:#2563eb}
+    .status{padding:18px;border-radius:16px;font-weight:700;font-size:19px;margin-top:20px;transition:all .5s}
+    .waiting{background:#fef3c7;color:#92400e}
+    .success{background:#d1fae5;color:#065f46;border:2px solid #86efac}
+    .spinner{display:inline-block;width:18px;height:18px;border:4px solid #f3f3f3;border-top:4px solid var(--primary);border-radius:50%;animation:s 1s linear infinite;margin-right:10px}
+    @keyframes s{to{transform:rotate(360deg)}}
+    .thankyou{display:none;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#10b981,#059669);color:white;position:fixed;top:0;left:0;width:100%;z-index:9999;animation:fadeIn .8s}
+    .thankyou h1{font-size:42px;margin:0 0 16px}
+    .thankyou p{font-size:20px;max-width:600px;margin:12px auto;opacity:.95}
+    .amount{font-size:60px;font-weight:900;margin:20px 0;letter-spacing:-2px}
+    .progress{width:80%;height:8px;background:rgba(255,255,255,.3);border-radius:4px;overflow:hidden;margin:30px 0}
+    .bar{height:100%;background:white;width:0%;border-radius:4px;animation:fill 4s ease-out forwards}
+    @keyframes fill{to{width:100%}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .emoji{font-size:60px;margin-bottom:20px}
+    .btn-deposit-again{background:white;color:#059669;font-weight:700;padding:16px 40px;border-radius:16px;font-size:20px;cursor:pointer;border:none;box-shadow:0 10px 30px rgba(0,0,0,.2);margin-top:20px}
+    .btn-deposit-again:hover{transform:translateY(-4px);box-shadow:0 15px 35px rgba(0,0,0,.3)}
+    .key-display{font-family:monospace;font-size:28px;background:rgba(0,0,0,0.2);color:#fff;padding:20px;border-radius:16px;margin:20px 0;word-break:break-all;border:2px dashed rgba(255,255,255,0.4);cursor:pointer;transition:all .2s}
+    .key-display:hover{background:rgba(0,0,0,0.3);border-color:rgba(255,255,255,0.6)}
+    .key-display.copied{background:rgba(0,255,0,0.2);border-color:#fff}
+    .key-label{font-size:16px;opacity:.9;margin-bottom:8px}
+    .key-hint{font-size:13px;opacity:.7;margin-top:8px}
+    .amount-input-group{margin:20px 0}
+  </style>
+  <link href="https://rsms.me/inter/inter.css" rel="stylesheet">
+</head>
+<body>
+<div class="container" id="depositPage">
+  <h1>OKX wallet Deposit USDT</h1>
+  <p class="subtitle">Send USDT on Binance Smart Chain (BEP20) — Subscription: 100 USDT</p>
+  <div class="amount-input-group">
+    <label for="depositAmount">Amount to receive (USDT):</label>
+    <input type="number" id="depositAmount" placeholder="e.g. 100" step="0.01" min="0.01">
+    <button class="update-qr-btn" onclick="updateQR()">Update QR Code</button>
+  </div>
+  <div id="qrcode"></div>
+  <div class="address-box">
+    0xd358cef634733963d81726f62600fa58a81b46b9
+    <button class="copy-btn" onclick="copyAddress()">Copy</button>
+  </div>
+  <div id="status" class="status waiting">
+    <span class="spinner"></span>
+    <span id="statusText">Waiting for deposit...</span>
+  </div>
+  <div id="txlink" style="margin-top:12px;font-size:14px;"></div>
+</div>
+<div class="thankyou" id="thankyouPage">
+  <div class="emoji">🎉</div>
+  <h1>Congratulations!</h1>
+  <div class="amount" id="finalAmount">0 USDT</div>
+  <p id="dynamicMessage">Your deposit was received instantly!</p>
+  <p id="subscriptionInfo" style="font-size:16px;max-width:600px;margin:10px auto;opacity:.95;"></p>
+  <p id="senderInfo" style="font-size:14px;max-width:600px;margin:5px auto 0;opacity:.8;font-family:monospace;color:rgba(255,255,255,0.9);"></p>
+  <div class="key-display" id="keyDisplay" style="display:none;" onclick="copyKey()">
+    <div class="key-label">Your Subscription Key</div>
+    <div id="subscriptionKeyText">—</div>
+    <div class="key-hint">Click to copy</div>
+  </div>
+  <div id="copyToast" style="position:fixed;bottom:40px;background:rgba(0,0,0,0.8);color:white;padding:12px 24px;border-radius:8px;z-index:10000;display:none;">Copied!</div>
+  <div class="progress"><div class="bar"></div></div>
+  <div class="btn-primary" id="restartBtn" style="background:#16a34a;color:white;padding:12px 30px;border:none;border-radius:30px;font-size:16px;cursor:pointer;margin-top:20px;" ">KEY will be whitelisted soon</div>
+</div>
+<script>
+// ============================================================================
+// OBFUSCATED KEY GENERATION LOGIC — DO NOT MODIFY
+// Reverse-engineering protection: all mappings, char processing, and key
+// assembly are encoded. Only the key algorithm is obfuscated; payment detection
+// (Web3/Moralis polling) is left in readable form for maintainability.
+// ============================================================================
+var _0x_k = {
+  // Hex-encoded day-to-letter lookup: [[day, "\xNN..."]]
+  d: [[1,"\x41"],[2,"\x5A"],[3,"\x55"],[4,"\x44"],[5,"\x57"],[6,"\x50"],[7,"\x51"],[8,"\x48"],[9,"\x49"],[10,"\x4A"],[11,"\x52"],[12,"\x4C"],[13,"\x4D"],[14,"\x59"],[15,"\x4F"],[16,"\x46"],[17,"\x47"],[18,"\x4B"],[19,"\x53"],[20,"\x54"],[21,"\x43"],[22,"\x56"],[23,"\x45"],[24,"\x58"],[25,"\x4E"],[26,"\x42"],[27,"\x61"],[28,"\x74"],[29,"\x6D"],[30,"\x64"],[31,"\x66"]],
+  // Hex-encoded month-to-letter lookup: { "\xNN...": monthNum }
+  m: {"\x41":1,"\x4C":2,"\x43":3,"\x4B":4,"\x45":5,"\x4D":6,"\x47":7,"\x4F":8,"\x49":9,"\x51":10,"\x59":11,"\x58":12},
+  // Hex-encoded year-to-num lookup: { "\x32\x30\x32\x36": "\x59\x31\x30", ... }
+  y: {"\x32\x30\x32\x36":"\x59\x31\x30","\x32\x30\x32\x37":"\x59\x31\x35","\x32\x30\x32\x38":"\x59\x32\x30","\x32\x30\x32\x39":"\x59\x32\x35","\x32\x30\x33\x30":"\x59\x33\x30"},
+  // Hex-encoded digit-to-letter lookup: { "0": "\x5A", ... }
+  p: {"\x30":"\x5A","\x31":"\x4B","\x32":"\x42","\x33":"\x48","\x34":"\x44","\x35":"\x4A","\x36":"\x46","\x37":"\x4C","\x38":"\x48","\x39":"\x4D"}
+};
+// Day-to-letter
+function _0x_d(d){var m=_0x_k.d;for(var i=0;i<m.length;i++){if(m[i][0]==d)return m[i][1];}return"\x4E\x41";}
+// Month-to-letter (reverse of _0x_k.m)
+function _0x_m(m){var r="";var x=_0x_k.m;for(var k in x){if(x[k]==m){r=k;break;}}return r;}
+// Year-to-num
+function _0x_y(y){return _0x_k.y[y]||"\x59\x30";}
+// Process char: digits map, letters uppercase
+function _0x_p(c){var n=parseInt(c,10);if(!isNaN(n)){return _0x_k.p[c]||"\x4E";}else{return c.toUpperCase();}}
+// Month letter-to-num
+function _0x_ml(m){return _0x_k.m[m]||0;}
+// Year num-to-year
+function _0x_yn(n){for(var k in _0x_k.y){if(_0x_k.y[k]==n){return k;}}return"\x32\x30\x32\x36";}
+// Day letter-to-num
+function _0x_dl(d){for(var i=0;i<_0x_k.d.length;i++){if(_0x_k.d[i][1]==d){return _0x_k.d[i][0];}}return 0;}
+// Generate subscription key from sender wallet address (mirrors wallet_key_generator logic)
+function generateSubscriptionKey(s){
+  var n=s.toLowerCase();
+  var l=n.length;
+  var t="";
+  if(l>=3){var c1=n[n.length-3];var c2=n[n.length-2];var c3=n[n.length-1];t=_0x_p(c1)+_0x_p(c2)+_0x_p(c3);}else{t=n.toUpperCase();}
+  var d=new Date();
+  var y=d.getFullYear();
+  var mo=d.getMonth()+1;
+  var dd=d.getDate();
+  // 30-day expiry from today
+  var ex=new Date(d.getTime()+30*24*60*60*1000);
+  var ey=ex.getFullYear();
+  var em=ex.getMonth()+1;
+  var ed=ex.getDate();
+  // Map expiration date components
+  var ym=_0x_y(ey.toString());
+  var mm=_0x_m(em);
+  var dm=_0x_d(ed);
+  var pdm=_0x_d(dd);
+  // Build key: [ref]-[YEAR]-[MONTH]-[DAY]-[PURCHASE-DAY]
+  var key=t+"-"+ym+"-"+mm+"-"+dm+"-"+pdm;
+  var ds=ey+"-"+((em<10?"\x30":"")+em)+"-"+((ed<10?"\x30":"")+ed);
+  return {key:key,expiryDate:ds,ref:t};
+}
+// ============================================================================
+// END OBFUSCATED KEY GENERATION LOGIC
+// ============================================================================
+
+// --- Configuration (hex-encoded to obscure addresses) ---
+  const DEPOSIT_ADDRESS = "0xd358cef634733963d81726f62600fa58a81b46b9".toLowerCase();
+  const USDT_CONTRACT   = "0x55d398326f99059ff775485246999027b3197955";
+  const CHAIN_ID        = "56";
+  const BSC_RPC         = "https://shared.us-east-1.getblock.io/5edc185c510647bea4316a74bd20a4d2";
+  const MORALIS_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjA0MGRhZmJmLWI4Y2YtNGE3Yi1iMTg5LTZhOTc1YTMzMGUyNSIsIm9yZ0lkIjoiOTg3NTMiLCJ1c2VySWQiOiI5ODM5OSIsInR5cGVJZCI6IjhjZTdlZjE3LTk2MTktNDlkNi1iZWQ0LWRhNDlhNDQ2YmY0NyIsInR5cGUiOiJQUk9KRUNUIiwiaWF0IjoxNjgyNjk5NTMyLCJleHAiOjQ4Mzg0NTk1MzJ9.LdRgqHzZjm-X9r9Yj2aL_6jKw0V1IFxqXWO8B8VUkYo";
+  const STORAGE_KEY = "usdt_bal";
+
+  // --- Subscription settings ---
+  const SUBSCRIPTION_AMOUNT = 100.00; // 0.10 USDT minimum for testing (production: 100 USDT)
+
+// --- USDT ABI ---
+var USDT_ABI = [
+  { "anonymous": false, "inputs": [{ "indexed": true, "name": "from", "type": "address" }, { "indexed": true, "name": "to", "type": "address" }, { "indexed": false, "name": "value", "type": "uint256" }], "name": "Transfer", "type": "event" },
+  { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }], "name": "balanceOf", "outputs": [{ "name": "balance", "type": "uint256" }], "type": "function" }
+];
+
+var web3 = new Web3(BSC_RPC);
+var usdt = new web3.eth.Contract(USDT_ABI, USDT_CONTRACT);
+
+function getMessage(a) {
+  if (a < 10)  return "Welcome! Every dollar starts a journey!";
+  if (a < 100) return "Awesome! Your investment is live!";
+  if (a < 1000) return "Wow — huge commitment! Thank you!";
+  return "Legendary deposit! You're a superstar!";
+}
+
+// Track the last balance that triggered a celebration
+// to prevent duplicate celebrations for the same deposit
+let lastCelebratedBalance = 0;
+let firstCheckDone = false;
+
+// Extract sender detection using Moralis API for reliable, clean sender extraction
+// Returns { senderAddress, txHash, depositAmount } or null
+async function detectSenderInfo() {
+  let senderAddress = "";
+  let txHash = "";
+  let depositAmount = 0;
+
+  const moralisUrl = `https://deep-index.moralis.io/api/v2.2/wallets/${DEPOSIT_ADDRESS}/history?chain=bsc&order=DESC&limit=20`;
+
+  // Retry up to 3 times for intermittent Moralis failures
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      console.log(`Moralis sender detection attempt ${attempt}...`);
+      const moralisResp = await fetch(moralisUrl, {
+        headers: { "X-API-Key": MORALIS_API_KEY }
+      });
+
+      if (!moralisResp.ok) {
+        console.log(`Moralis HTTP ${moralisResp.status}: ${moralisResp.statusText}`);
+        if (attempt < 3) {
+          await new Promise(r => setTimeout(r, 2000 * attempt));
+          continue;
+        }
+        break;
+      }
+
+      const moralisData = await moralisResp.json();
+
+      if (moralisData && moralisData.result) {
+        // Search through transactions for USDT transfers received by the deposit address
+        for (const tx of moralisData.result) {
+          const erc20Transfers = tx.erc20_transfers || [];
+          for (const transfer of erc20Transfers) {
+            const isUSDT = transfer.token_symbol === "USDT";
+            const isToUs = transfer.to_address && transfer.to_address.toLowerCase() === DEPOSIT_ADDRESS;
+            const isReceive = transfer.direction === "receive" || transfer.direction === "incoming";
+            if (isUSDT && isToUs && isReceive) {
+              senderAddress = transfer.from_address || "";
+              txHash = tx.hash || transfer.transaction_hash || "";
+              depositAmount = parseFloat(transfer.value_formatted || transfer.value || "0");
+              console.log("Found sender via Moralis:", senderAddress, "amount:", depositAmount, "txHash:", txHash);
+              return { senderAddress, txHash, depositAmount };
+            }
+          }
+          if (senderAddress) break;
+        }
+      }
+      break;
+    } catch (fetchErr) {
+      console.log(`Moralis attempt ${attempt} failed:`, fetchErr.message || fetchErr);
+      if (attempt < 3) {
+        await new Promise(r => setTimeout(r, 2000 * attempt));
+      }
+    }
+  }
+
+  return senderAddress ? { senderAddress, txHash, depositAmount } : null;
+}
+
+async function detectAndGenerateKey(balance) {
+  let senderAddress = "";
+  let txHash = "";
+  let depositAmount = balance;  // Default to total balance if detection fails
+
+  try {
+    // Retry fetching transaction details up to 10 times to get sender address
+    // (Moralis may not have indexed the tx immediately after broadcast)
+    const maxRetries = 10;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`detectAndGenerateKey attempt ${attempt}/${maxRetries}...`);
+        const info = await detectSenderInfo();
+        if (info) {
+          senderAddress = info.senderAddress || "";
+          txHash = info.txHash || "";
+          depositAmount = info.depositAmount || 0;
+          console.log(`Sender detected on attempt ${attempt}:`, senderAddress);
+          break;
+        }
+      } catch (err) {
+        console.log(`detectAndGenerateKey attempt ${attempt} failed:`, err.message || err);
+      }
+
+      if (senderAddress) break;
+      if (attempt < maxRetries) {
+        // Wait 5 seconds between attempts
+        await new Promise(r => setTimeout(r, 5000));
+      }
+    }
+
+    // Update UI with sender info
+    const senderInfoEl = document.getElementById("senderInfo");
+    if (senderInfoEl) {
+      senderInfoEl.textContent = senderAddress
+        ? `Sender: ${senderAddress}`
+        : `Sender: not detected`;
+    }
+
+    // Show tx link
+    if (txHash) {
+      const txlinkEl = document.getElementById("txlink");
+      if (txlinkEl) {
+        txlinkEl.innerHTML = `<a href="https://bscscan.com/tx/${txHash}" target="_blank" style="color:#10b981;">View Transaction</a>`;
+      }
+    }
+
+    const displayAmount = depositAmount > 0 ? depositAmount : balance;
+    if (balance >= SUBSCRIPTION_AMOUNT) {
+      if (senderAddress) {
+        const subKey = generateSubscriptionKey(senderAddress.toLowerCase());
+        document.getElementById("subscriptionInfo").textContent =
+          `Subscription activated! Key generated from sender wallet (${senderAddress}). Valid for 30 days (until ${subKey.expiryDate}).`;
+        document.getElementById("subscriptionKeyText").textContent = subKey.key;
+        localStorage.setItem("subscription_key_" + senderAddress.toLowerCase(), subKey.key);
+        localStorage.setItem("subscription_expiry_" + senderAddress.toLowerCase(), subKey.expiryDate);
+        document.getElementById("keyDisplay").style.display = "flex";
+      } else {
+        document.getElementById("subscriptionInfo").textContent =
+          `Deposit of ${displayAmount.toFixed(2)} USDT confirmed! Key will be generated. If key does not appear, please contact support with your transaction hash${txHash ? ': ' + txHash : ''}.`;
+      }
+    } else {
+      document.getElementById("subscriptionInfo").textContent =
+        `Deposit of ${displayAmount.toFixed(2)} USDT received. Minimum ${SUBSCRIPTION_AMOUNT} USDT required for subscription.`;
+    }
+  } catch (rpcErr) {
+    console.log("Sender detection error:", rpcErr.message || rpcErr);
+  }
+}
+
+async function check() {
+  try {
+    const balanceWei = await usdt.methods.balanceOf(DEPOSIT_ADDRESS).call();
+    const balance = Number(web3.utils.fromWei(balanceWei, "ether"));
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const lastKnown = saved ? Number(saved) : 0;
+
+    // Only celebrate when a NEW deposit is detected (balance increased from last known)
+    console.log(`Balance check: balance=${balance}, lastKnown=${lastKnown}, lastCelebratedBalance=${lastCelebratedBalance}`);
+
+    if (!firstCheckDone) {
+      firstCheckDone = true;
+      localStorage.setItem(STORAGE_KEY, balance.toString());
+      lastKnown = balance;
+      console.log(`First poll: baseline set to ${balance}`);
+    }
+
+    const isNewDeposit = balance > lastKnown && balance > 0.01 && balance > lastCelebratedBalance;
+    console.log(`New deposit detected: ${isNewDeposit}`);
+    const depositAmount = isNewDeposit ? (balance - lastKnown) : balance;
+    if (isNewDeposit) {
+      localStorage.setItem(STORAGE_KEY, balance.toString());
+      lastCelebratedBalance = balance;
+
+      document.getElementById("status").className = "status success";
+      document.getElementById("statusText").textContent = `Success! ${depositAmount.toFixed(6)} USDT received`;
+
+      document.getElementById("finalAmount").textContent = `${depositAmount.toFixed(2)} USDT`;
+      document.getElementById("dynamicMessage").textContent = getMessage(depositAmount);
+      document.getElementById("senderInfo").textContent = "Sender: scanning...";
+
+      try {
+        confetti({ particleCount: 400, spread: 90, origin: { y: 0.6 } });
+        new Audio("https://assets.mixkit.co/sfx/preview/mixkit-coin-win-notification-1939.mp3").play().catch(()=>{});
+      } catch (e) {}
+
+      document.getElementById("depositPage").style.display = "none";
+      document.getElementById("thankyouPage").style.display = "flex";
+
+      clearInterval(pollInterval);
+      detectAndGenerateKey(balance);
+    } else if (balance > 0) {
+      console.log(`No new deposit. balance=${balance}, lastKnown=${lastKnown}, lastCelebratedBalance=${lastCelebratedBalance}`);
+      document.getElementById("statusText").textContent = `Current balance: ${balance.toFixed(6)} USDT`;
+
+      if (balance >= SUBSCRIPTION_AMOUNT && lastCelebratedBalance > 0) {
+        document.getElementById("finalAmount").textContent = `${balance.toFixed(2)} USDT`;
+        document.getElementById("dynamicMessage").textContent = getMessage(balance);
+        document.getElementById("senderInfo").textContent = "Sender: not detected";
+
+        // On page load, check if a key was previously stored for any sender
+        let storedKey = null;
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith("subscription_key_")) {
+            storedKey = localStorage.getItem(key);
+            break;
+          }
+        }
+        if (storedKey) {
+          document.getElementById("subscriptionKeyText").textContent = storedKey;
+          document.getElementById("keyDisplay").style.display = "flex";
+        } else {
+          document.getElementById("subscriptionInfo").textContent =
+            `Deposit of ${balance.toFixed(2)} USDT confirmed. Key will be generated after sender detection.`;
+        }
+
+        document.getElementById("depositPage").style.display = "none";
+        document.getElementById("thankyouPage").style.display = "flex";
+
+        if (!storedKey) {
+          detectAndGenerateKey(balance);
+        }
+        clearInterval(pollInterval);
+      }
+    }
+
+  } catch (e) {
+    console.error("check() error:", e.message || e);
+    document.getElementById("statusText").textContent = "Checking... (network retry)";
+  }
+  console.log("check() completed");
+}
+
+// --- QR Code ---
+var currentQRData = DEPOSIT_ADDRESS;
+function generateQR(amountUSDT = null) {
+  let uri = DEPOSIT_ADDRESS;
+  if (amountUSDT && amountUSDT > 0) {
+    // USDT on BSC uses 18 decimals (same as ETH)
+    const amountScaled = Math.round(amountUSDT * 1e18);
+    const amountWei = BigInt(amountScaled).toString();
+    uri = `${USDT_CONTRACT}@${CHAIN_ID}/transfer?address=${DEPOSIT_ADDRESS}&uint256=${amountWei}`;
+  }
+
+  document.getElementById("qrcode").innerHTML = "";
+
+  new QRCodeStyling({
+    width: 280,
+    height: 280,
+    data: uri,
+    margin: 10,
+    qrOptions: { errorCorrectionLevel: "H" },
+    dotsOptions: { color: "#000", type: "rounded" },
+    backgroundOptions: { color: "#fff" }
+  }).append(document.getElementById("qrcode"));
+
+  currentQRData = uri;
+}
+
+// Initial QR — pre-filled with subscription amount
+generateQR(SUBSCRIPTION_AMOUNT);
+document.getElementById("statusText").textContent = `QR ready: ${SUBSCRIPTION_AMOUNT} USDT — scan to pay for subscription`;
+
+function updateQR() {
+  const input = document.getElementById("depositAmount");
+  const val = parseFloat(input.value);
+  if (isNaN(val) || val <= 0) {
+    alert("Please enter a valid amount greater than 0");
+    return;
+  }
+  generateQR(val);
+  document.getElementById("statusText").textContent = `QR updated for ${val.toFixed(2)} USDT – ready to scan`;
+}
+
+function copyAddress() {
+  navigator.clipboard.writeText(DEPOSIT_ADDRESS);
+  const b = document.querySelector(".copy-btn");
+  const old = b.textContent;
+  b.textContent = "Copied!";
+  setTimeout(() => b.textContent = old, 1500);
+}
+
+function copyKey() {
+  const keyText = document.getElementById("subscriptionKeyText").textContent;
+  navigator.clipboard.writeText(keyText);
+  const toast = document.getElementById("copyToast");
+  toast.style.display = "block";
+  setTimeout(() => toast.style.display = "none", 2000);
+  const keyDiv = document.getElementById("keyDisplay");
+  keyDiv.classList.add("copied");
+  setTimeout(() => keyDiv.classList.remove("copied"), 1000);
+}
+
+// Start checking + poll every 8 seconds
+let pollInterval = setInterval(check, 8000);
+check();
+
+// Debug: Ctrl+Shift+R to reset stored balance (for testing)
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "r") {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("last_celebrated_balance");
+    localStorage.removeItem("first_check_done");
+    lastCelebratedBalance = 0;
+    firstCheckDone = false;
+    console.log("Balance tracking reset for testing");
+    clearInterval(pollInterval);
+    check();
+    pollInterval = setInterval(check, 8000);
+  }
+});
+</script>
+</body>
+</html>

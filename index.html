@@ -191,12 +191,19 @@
         /* OB Trading Visual */
         .chart-preview {
             background: #0f172a; border-radius: 12px; padding: 20px; margin: 30px 0;
-            min-height: 250px; display: flex; align-items: center; justify-content: center;
+            min-height: 250px;
         }
-        .chart-preview .placeholder {
-            text-align: center; color: #94a3b8;
-        }
-        .chart-preview .placeholder .draw { font-size: 3em; margin-bottom: 15px; opacity: 0.5; }
+        .chart-preview .carousel-container { position: relative; max-width: 100%; }
+        .chart-preview .carousel-wrapper { display: flex; align-items: center; justify-content: center; }
+        .chart-preview .carousel-slide { display: none; max-width: 100%; max-height: 70vh; border-radius: 12px; object-fit: contain; }
+        .chart-preview .carousel-slide.active { display: block; }
+        .chart-preview .carousel-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .chart-preview .carousel-nav:hover { background: rgba(255,255,255,0.3); }
+        .chart-preview .carousel-prev { left: 10px; }
+        .chart-preview .carousel-next { right: 10px; transform: translateY(-50%) rotate(180deg); }
+        .chart-preview .carousel-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+        .chart-preview .carousel-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.2s; }
+        .chart-preview .carousel-dot.active { background: white; }
 
         /* Reference Guide Links */
         .ref-links {
@@ -362,13 +369,20 @@
         </div>
     </section>
 
-    <!-- Chart Preview -->
+    <!-- Chart Preview (Carousel) -->
     <div class="container">
         <div class="chart-preview">
-            <div class="placeholder">
-                <div class="draw" data-en="📊" data-es="📊">📊</div>
-                <p data-en="Chart preview: OB rectangles (green/red), FVG zones with 50% lines, BOS markers, and CVD delta pane below" data-es="Vista previa del gráfico: rectángulos OB (verde/rojo), zonas FVG con líneas del 50%, marcadores BOS y pane de delta CVD abajo"></p>
+            <div class="carousel-container">
+                <div class="carousel-wrapper" id="chartCarousel">
+                    <img src="ETHUSDT_2026-08-11_06-05-19.png" alt="ETHUSDT Chart: OB rectangles (green/red), FVG zones with 50% lines, BOS markers, and CVD delta pane below" class="carousel-slide active">
+                    <img src="ADAUSDT_2026-08-11_06-10-56.png" alt="ADAUSDT Chart: OB rectangles (green/red), FVG zones with 50% lines, BOS markers, and CVD delta pane below" class="carousel-slide">
+                    <img src="BTCUSDT_2026-08-11_06-16-26.png" alt="BTCUSDT Chart: OB rectangles (green/red), FVG zones with 50% lines, BOS markers, and CVD delta pane below" class="carousel-slide">
+                </div>
+                <button class="carousel-nav carousel-prev" id="carouselPrev">&#10034;</button>
+                <button class="carousel-nav carousel-next" id="carouselNext">&#10034;</button>
+                <div class="carousel-dots" id="carouselDots"></div>
             </div>
+            <p style="text-align:center;margin:0;color:#f9fafb;" data-en="Chart preview: OB rectangles (green/red), FVG zones with 50% lines, BOS markers, and CVD delta pane below" data-es="Vista previa del gráfico: rectángulos OB (verde/rojo), zonas FVG con líneas del 50%, marcadores BOS y pane de delta CVD abajo"></p>
         </div>
     </div>
 
@@ -458,8 +472,15 @@
     <!-- CTA Section -->
     <section class="cta">
         <h2 data-en="Ready to Trade Institutional Flow?" data-es="¿Listo para Operar Flujo Institucional?">Ready to Trade Institutional Flow?</h2>
-        <p data-en="Download the OB CVD indicators and start applying the 2-rule strategy to your charts today." data-es="Descarga los indicadores OB CVD y comienza a aplicar la estrategia de 2 reglas en tus gráficos hoy.">Download the OB CVD indicators and start applying the 2-rule strategy to your charts today.</p>
-        <a href="#download" class="cta-button" data-en="Get the Indicators →" data-es="Consigue los Indicadores →">Get the Indicators →</a>
+        <p data-en="Join the TwoRuleTrader community. Buy for USDT 100 on BSC BEP20 to receive the complete OB CVD indicator set, private community group, priority support, and weekly live day trading sessions valid for 30 days." data-es="Únete a la comunidad TwoRuleTrader. Compra por USDT 100 en BSC BEP20 para recibir el conjunto completo de indicadores OB CVD, grupo comunitario privado, soporte prioritario y sesiones semanales en vivo de day trading valido por 30 days.">
+            Join the TwoRuleTrader community. Buy for USDT 100 on BSC BEP20 to receive the complete OB CVD indicator set, private community group, priority support, and weekly live day trading sessions valid for 30 days.
+        </p>
+        <p data-en="✓ OB Fractal FVG indicator (TradingView Pine Script v6)" data-es="✓ Indicador OB Fractal FVG (Pine Script v6 para TradingView)">✓ OB Fractal FVG indicator (TradingView Pine Script v6)</p>
+        <p data-en="✓ CVD Delta Table indicator (Pine Script v6)" data-es="✓ Tabla Delta CVD (Pine Script v6)">✓ CVD Delta Table indicator (Pine Script v6)</p>
+        <p data-en="✓ Private Telegram community group access" data-es="✓ Acceso al grupo comunitario privado de Telegram">✓ Private Telegram community group access</p>
+        <p data-en="✓ Priority support & trade reviews" data-es="✓ Soporte prioritario y revisiones de operaciones">✓ Priority support & trade reviews</p>
+        <p data-en="✓ Weekly live day trading sessions" data-es="✓ Sesiones semanales en vivo de day trading">✓ Weekly live day trading sessions</p>
+        <a href="deposit_OKX_WALLET.html" class="cta-button" data-en="Buy Now — USDT 100 →" data-es="Comprar Ahora — USDT 100 →">Buy Now — USDT 100 →</a>
     </section>
 
     <!-- Reference Guide Links -->
@@ -517,6 +538,68 @@
         // Set default language based on browser
         const browserLang = navigator.language.startsWith('es') ? 'es' : 'en';
         setLang(browserLang);
+
+        // Chart Carousel
+        (function() {
+            const carousel = document.getElementById('chartCarousel');
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            const prevBtn = document.getElementById('carouselPrev');
+            const nextBtn = document.getElementById('carouselNext');
+            const dotsContainer = document.getElementById('carouselDots');
+            let currentSlide = 0;
+            let slideInterval;
+
+            function updateDots() {
+                dotsContainer.innerHTML = '';
+                slides.forEach((_, i) => {
+                    const dot = document.createElement('div');
+                    dot.classList.add('carousel-dot');
+                    if (i === currentSlide) dot.classList.add('active');
+                    dot.onclick = () => goToSlide(i);
+                    dotsContainer.appendChild(dot);
+                });
+            }
+
+            function updateSlides() {
+                slides.forEach((s, i) => {
+                    s.classList.toggle('active', i === currentSlide);
+                });
+                updateDots();
+            }
+
+            function goToSlide(index) {
+                currentSlide = (index + slides.length) % slides.length;
+                updateSlides();
+                resetInterval();
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                updateSlides();
+                resetInterval();
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                updateSlides();
+                resetInterval();
+            }
+
+            function startInterval() {
+                slideInterval = setInterval(nextSlide, 5000);
+            }
+
+            function resetInterval() {
+                clearInterval(slideInterval);
+                startInterval();
+            }
+
+            prevBtn.onclick = prevSlide;
+            nextBtn.onclick = nextSlide;
+
+            updateDots();
+            startInterval();
+        })();
     </script>
 </body>
 </html>
