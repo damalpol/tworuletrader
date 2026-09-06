@@ -3,45 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="OB CVD Trading System - Simple 2-Rule Strategy for Forex, Indices, Stocks & Crypto Day Trading">
-    <meta name="keywords" content="order block, CVD, cumulative delta volume, forex trading, crypto day trading, stock trading, indices trading, trading strategy, BOS, fair value gap, tradingview">
-    <title>OB CVD Trading System — 2-Rule Strategy for Forex, Crypto, Stocks & Indices</title>
+    <meta name="description" content="SMC Structure V7 — Professional Market Structure Trading System. 7-step course-aligned SMC engine, external/internal swing logic, MTF dashboard, session ranges.">
+    <meta name="keywords" content="SMC, smart money concepts, market structure, BOS, CHOCH, swing high, swing low, tradingview indicator, forex, crypto, day trading">
+    <title>SMC Structure V7 — Professional Market Structure Trading System</title>
     <style>
         :root {
             --green: #16a34a;
             --red: #dc2626;
             --orange: #ea580c;
             --blue: #2563eb;
-            --dark: #1f2937;
-            --light: #f9fafb;
-            --gray: #6b7280;
-            --border: #e5e7eb;
+            --dark: #0d1117;
+            --light: #f0f6fc;
+            --gray: #8b949e;
+            --border: #30363d;
+            --card-bg: #161b22;
+            --accent: #58a6ff;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--light); color: var(--dark); line-height: 1.6; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--dark); color: #c9d1d9; line-height: 1.6; overflow-x: hidden; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
         /* Header */
         header {
-            background: linear-gradient(135deg, var(--green), var(--orange));
-            color: white; padding: 60px 0; text-align: center; position: relative; overflow: hidden;
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            border-bottom: 1px solid var(--border);
+            color: white; padding: 50px 0 40px; text-align: center; position: relative;
         }
-        header::before {
-            content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="3" fill="%23ffffff" opacity="0.3"/><path d="M50 5 L55 35 L85 35 L60 55 L65 85 L50 65 L35 85 L40 55 L15 35 L45 35 Z" fill="%23ffffff" opacity="0.2"/></svg>');
-            background-size: contain; background-repeat: no-repeat; animation: spin 20s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        header h1 { font-size: 2.5em; margin-bottom: 15px; position: relative; z-index: 2; }
-        header p { font-size: 1.2em; opacity: 0.95; max-width: 800px; margin: 0 auto; position: relative; z-index: 2; }
-        .subtitle-badge {
-            display: inline-block; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
-            padding: 10px 25px; border-radius: 30px; font-size: 0.95em; margin-top: 15px;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
+        header h1 { font-size: 2.4em; margin-bottom: 10px; letter-spacing: -0.5px; }
+        header h1 span { color: var(--accent); }
+        header .version { display: inline-block; background: rgba(88,166,255,0.15); color: var(--accent); padding: 4px 14px; border-radius: 20px; font-size: 0.85em; font-weight: 600; margin-bottom: 15px; border: 1px solid rgba(88,166,255,0.3); }
+        header p { font-size: 1.1em; color: var(--gray); max-width: 700px; margin: 0 auto; }
+        .header-badges { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+        .header-badges span { background: rgba(255,255,255,0.06); padding: 6px 16px; border-radius: 6px; font-size: 0.85em; color: var(--gray); border: 1px solid var(--border); }
 
         /* Language Toggle */
         .lang-toggle {
@@ -49,191 +42,124 @@
         }
         .lang-btn {
             padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold;
-            background: white; color: var(--dark); box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            background: var(--card-bg); color: #c9d1d9; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease; border: 1px solid var(--border);
         }
-        .lang-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .lang-btn.active { background: var(--green); color: white; }
+        .lang-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .lang-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-        /* Hero Section */
-        .hero { padding: 80px 0; background: white; text-align: center; position: relative; }
-        .hero::after {
-            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 80%; height: 1px; background: var(--border);
-        }
-        .icon-grid { display: flex; justify-content: center; gap: 30px; margin: 40px 0; flex-wrap: wrap; }
-        .icon-item { text-align: center; animation: bounce 3s infinite; }
-        .icon-item:nth-child(2) { animation-delay: 0.3s; }
-        .icon-item:nth-child(3) { animation-delay: 0.6s; }
-        .icon-item:nth-child(4) { animation-delay: 0.9s; }
-        .icon-circle {
-            width: 80px; height: 80px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--green), var(--orange));
-            display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;
-            font-size: 2em; box-shadow: 0 4px 20px rgba(22,150,74,0.3);
-        }
-        .hero h2 { font-size: 2em; margin-bottom: 15px; color: var(--dark); }
-        .hero p { font-size: 1.1em; color: var(--gray); max-width: 700px; margin: 0 auto; }
+        /* Section titles */
+        section { padding: 60px 0; }
+        .section-title { text-align: center; font-size: 1.8em; margin-bottom: 10px; color: #f0f6fc; }
+        .section-sub { text-align: center; color: var(--gray); margin-bottom: 50px; max-width: 700px; margin-left: auto; margin-right: auto; font-size: 1.05em; }
 
-        /* Markets Section */
-        .markets { padding: 60px 0; text-align: center; }
-        .markets h2 { font-size: 1.8em; margin-bottom: 10px; color: var(--dark); }
-        .markets p { color: var(--gray); margin-bottom: 40px; font-size: 1.1em; }
-        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; }
-        .market-card {
-            background: white; border: 1px solid var(--border); border-radius: 12px; padding: 25px;
-            transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .market-card:hover {
-            transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            border-color: var(--green);
-        }
-        .market-icon { font-size: 2.5em; margin-bottom: 15px; }
-        .market-card h3 { color: var(--dark); margin-bottom: 8px; font-size: 1.1em; }
-        .market-card p { color: var(--gray); font-size: 0.9em; }
+        /* Chart preview */
+        .chart-preview { max-width: 900px; margin: 40px auto; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+        .chart-preview img { width: 100%; display: block; }
 
-        /* Strategy Section */
-        .strategy { padding: 80px 0; background: linear-gradient(135deg, #f0fdf4, #eff6ff); }
-        .strategy h2 { text-align: center; font-size: 1.8em; margin-bottom: 10px; color: var(--dark); }
-        .strategy p { text-align: center; color: var(--gray); margin-bottom: 50px; max-width: 700px; margin-left: auto; margin-right: auto; }
+        /* Feature Grid */
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+        .feature-card {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 28px;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .feature-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+        .feature-card .icon { font-size: 1.8em; margin-bottom: 12px; display: block; }
+        .feature-card h3 { color: #f0f6fc; margin-bottom: 10px; font-size: 1.15em; }
+        .feature-card p { color: var(--gray); font-size: 0.93em; line-height: 1.5; }
+        .feature-card .badge {
+            display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.72em;
+            font-weight: 600; margin-top: 10px; background: rgba(88,166,255,0.15); color: var(--accent); border: 1px solid rgba(88,166,255,0.3);
+        }
 
-        .rules-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        /* Rules Section */
+        .rules-bg { background: linear-gradient(180deg, var(--card-bg), var(--dark)); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; }
         .rule-card {
-            background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            border-top: 4px solid var(--green); position: relative; overflow: hidden;
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 28px;
+            border-left: 4px solid var(--accent); transition: all 0.3s ease;
         }
-        .rule-card:nth-child(2) { border-top-color: var(--orange); }
-        .rule-number {
-            position: absolute; top: -10px; right: -10px;
-            width: 50px; height: 50px; border-radius: 50%;
-            background: var(--green); color: white; display: flex; align-items: center;
-            justify-content: center; font-size: 1.5em; font-weight: bold;
-        }
-        .rule-number:nth-child(2) { background: var(--orange); }
-        .rule-card h3 { color: var(--dark); margin-bottom: 15px; font-size: 1.2em; display: flex; align-items: center; gap: 10px; }
-        .rule-card .icon { font-size: 1.5em; }
-        .rule-card ul { padding-left: 20px; }
-        .rule-card li { margin-bottom: 8px; color: var(--gray); }
-        .rule-card .key { color: var(--green); font-weight: bold; }
+        .rule-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        .rule-card .rule-num { font-size: 1.8em; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+        .rule-card h3 { color: #f0f6fc; font-size: 1.15em; margin-bottom: 10px; }
+        .rule-card ul { padding-left: 18px; }
+        .rule-card li { color: var(--gray); margin-bottom: 6px; font-size: 0.93em; }
 
-        /* How It Works */
-        .how-it-works { padding: 60px 0; }
-        .how-it-works h2 { text-align: center; font-size: 1.8em; margin-bottom: 50px; color: var(--dark); }
-        .steps { display: flex; flex-direction: column; gap: 30px; }
-        .step { display: flex; gap: 20px; align-items: flex-start; }
-        .step-number {
-            width: 40px; height: 40px; border-radius: 50%; background: var(--green);
-            color: white; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 1.1em; flex-shrink: 0;
+        /* Sessions Table */
+        .sessions-box {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+            padding: 30px; max-width: 600px; margin: 0 auto;
         }
-        .step-content { flex: 1; }
-        .step h3 { color: var(--dark); margin-bottom: 5px; font-size: 1.1em; }
-        .step p { color: var(--gray); }
+        .sessions-box h3 { color: #f0f6fc; text-align: center; margin-bottom: 20px; font-size: 1.2em; }
+        .session-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .session-row:last-child { border-bottom: none; }
+        .session-name { font-weight: 600; }
+        .session-name.asia { color: #f0883e; }
+        .session-name.london { color: #58a6ff; }
+        .session-name.ny { color: #3fb950; }
+        .session-time { color: var(--gray); font-family: monospace; }
 
-        /* Indicators Section */
-        .indicators { padding: 60px 0; background: white; }
-        .indicators h2 { text-align: center; font-size: 1.8em; margin-bottom: 10px; color: var(--dark); }
-        .indicators p { text-align: center; color: var(--gray); margin-bottom: 50px; }
-        .indicator-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
-        .indicator-card {
-            border: 1px solid var(--border); border-radius: 12px; padding: 25px; transition: all 0.3s ease;
+        /* Dashboard preview */
+        .dash-preview {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px;
+            padding: 20px; max-width: 500px; margin: 20px auto; font-family: monospace;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
         }
-        .indicator-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-color: var(--green); }
-        .indicator-card h3 { color: var(--green); margin-bottom: 15px; font-size: 1.2em; display: flex; align-items: center; gap: 10px; }
-        .indicator-card .icon { font-size: 1.8em; }
-        .indicator-card ul { padding-left: 20px; }
-        .indicator-card li { margin-bottom: 6px; color: var(--gray); }
-        .indicator-card .badge {
-            display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em;
-            font-weight: bold; margin-left: 5px;
-        }
-        .badge-green { background: var(--green); color: white; }
-        .badge-red { background: var(--red); color: white; }
+        .dash-preview .dash-hdr { background: rgba(88,166,255,0.15); padding: 6px 10px; border-radius: 4px; text-align: center; font-size: 0.85em; font-weight: 600; color: var(--accent); }
+        .dash-preview .dash-label { background: rgba(88,166,255,0.08); padding: 6px 10px; border-radius: 4px; text-align: center; font-size: 0.8em; color: var(--gray); }
+        .dash-preview .dash-val { padding: 6px 10px; border-radius: 4px; text-align: center; font-size: 0.8em; color: #f0f6fc; }
 
-        /* CTA Section */
+        /* Course Steps */
+        .steps { display: flex; flex-direction: column; gap: 18px; max-width: 700px; margin: 0 auto; }
+        .step { display: flex; gap: 16px; align-items: flex-start; background: var(--card-bg); padding: 18px 22px; border-radius: 10px; border: 1px solid var(--border); }
+        .step-num { width: 32px; height: 32px; min-width: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9em; }
+        .step-content h3 { color: #f0f6fc; font-size: 1em; margin-bottom: 4px; }
+        .step-content p { color: var(--gray); font-size: 0.9em; }
+
+        /* CTA */
         .cta {
-            padding: 80px 0; background: linear-gradient(135deg, var(--green), var(--orange));
-            color: white; text-align: center; border-radius: 12px; margin: 40px 0;
+            background: linear-gradient(135deg, rgba(88,166,255,0.1), rgba(22,163,74,0.1));
+            border: 1px solid var(--border); border-radius: 12px; text-align: center;
+            padding: 50px 30px; margin: 30px 0;
         }
-        .cta h2 { font-size: 2em; margin-bottom: 15px; }
-        .cta p { font-size: 1.1em; margin-bottom: 30px; max-width: 700px; margin-left: auto; margin-right: auto; }
+        .cta h2 { color: #f0f6fc; font-size: 1.8em; margin-bottom: 10px; }
+        .cta p { color: var(--gray); margin-bottom: 25px; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .cta-features { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 30px; }
+        .cta-features span { color: var(--gray); font-size: 0.95em; }
+        .cta-features span::before { content: '✓ '; color: var(--green); font-weight: 700; }
         .cta-button {
-            display: inline-block; background: white; color: var(--green);
-            padding: 15px 40px; border-radius: 50px; text-decoration: none;
-            font-weight: bold; font-size: 1.1em; transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2); animation: pulse 2s infinite;
+            display: inline-block; background: var(--accent); color: white;
+            padding: 14px 40px; border-radius: 50px; text-decoration: none;
+            font-weight: 600; font-size: 1.1em; transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(88,166,255,0.3);
         }
-        .cta-button:hover {
-            transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); animation: none;
-        }
+        .cta-button:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(88,166,255,0.5); }
 
-        /* Benefits Section */
-        .benefits { padding: 60px 0; }
-        .benefits h2 { text-align: center; font-size: 1.8em; margin-bottom: 50px; color: var(--dark); }
-        .benefit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .benefit-item { display: flex; gap: 15px; align-items: flex-start; }
-        .benefit-icon { font-size: 1.8em; flex-shrink: 0; }
-        .benefit-content h3 { color: var(--dark); margin-bottom: 5px; font-size: 1.1em; }
-        .benefit-content p { color: var(--gray); font-size: 0.95em; }
+        /* Benefits */
+        .benefit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .benefit-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; text-align: center; }
+        .benefit-item .icon { font-size: 2em; margin-bottom: 8px; }
+        .benefit-item h3 { color: #f0f6fc; font-size: 1em; margin-bottom: 5px; }
+        .benefit-item p { color: var(--gray); font-size: 0.85em; }
 
         /* Footer */
-        footer { background: var(--dark); color: white; padding: 40px 0; text-align: center; }
+        footer { border-top: 1px solid var(--border); padding: 30px 0; text-align: center; }
         footer p { color: var(--gray); font-size: 0.9em; }
-        .social-link { display: inline-block; margin-top: 15px; }
-        .social-icon { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
+        .social-link { display: inline-block; margin-top: 12px; }
+        .social-icon { width: 28px; height: 28px; border-radius: 50%; vertical-align: middle; opacity: 0.6; transition: opacity 0.3s; }
+        .social-icon:hover { opacity: 1; }
 
-        /* Responsive */
         @media (max-width: 768px) {
-            header h1 { font-size: 1.8em; }
-            .hero h2 { font-size: 1.5em; }
-            .rule-card { padding: 20px; }
+            header h1 { font-size: 1.6em; }
+            .section-title { font-size: 1.4em; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .rules-grid { grid-template-columns: 1fr; }
             .step { flex-direction: column; }
+            .dash-preview { grid-template-columns: repeat(2, 1fr); }
         }
-
-        /* OB Trading Visual */
-        .chart-preview {
-            background: #0f172a; border-radius: 12px; padding: 20px; margin: 30px 0;
-            min-height: 250px;
-        }
-        .chart-preview .carousel-container { position: relative; max-width: 100%; }
-        .chart-preview .carousel-wrapper { display: flex; align-items: center; justify-content: center; }
-        .chart-preview .carousel-slide { display: none; max-width: 100%; max-height: 70vh; border-radius: 12px; object-fit: contain; }
-        .chart-preview .carousel-slide.active { display: block; }
-        .chart-preview .carousel-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .chart-preview .carousel-nav:hover { background: rgba(255,255,255,0.3); }
-        .chart-preview .carousel-prev { left: 10px; }
-        .chart-preview .carousel-next { right: 10px; transform: translateY(-50%) rotate(180deg); }
-        .chart-preview .carousel-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
-        .chart-preview .carousel-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.2s; }
-        .chart-preview .carousel-dot.active { background: white; }
-
-        /* Reference Guide Links */
-        .ref-links {
-            display: flex; justify-content: center; gap: 20px; margin: 30px 0;
-            flex-wrap: wrap;
-        }
-        .ref-link {
-            display: flex; align-items: center; gap: 10px;
-            background: white; border: 1px solid var(--border); border-radius: 10px;
-            padding: 14px 24px; text-decoration: none; transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .ref-link:hover {
-            transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-            border-color: var(--green);
-        }
-        .ref-link .ref-icon {
-            font-size: 1.6em; animation: pulse 2s infinite;
-        }
-        .ref-link .ref-text {
-            font-weight: 600; color: var(--dark); font-size: 0.95em; white-space: nowrap;
-        }
-        .ref-link.en .ref-text { color: var(--green); }
-        .ref-link.es .ref-text { color: var(--orange); }
     </style>
 </head>
 <body>
-    <!-- Language Toggle -->
     <div class="lang-toggle">
         <button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button>
         <button class="lang-btn" id="btnES" onclick="setLang('es')">ES</button>
@@ -242,266 +168,323 @@
     <!-- Header -->
     <header>
         <div class="container">
-            <h1 data-en="OB CVD Trading System" data-es="Sistema de Trading OB CVD">OB CVD Trading System</h1>
-            <p data-en="Master institutional order flow with a simple 2-rule strategy. Perfect for day trading forex, crypto, stocks and indices." data-es="Domina el flujo de órdenes institucionales con una estrategia simple de 2 reglas. Perfecto para day trading de forex, cripto, acciones e índices.">
-                Master institutional order flow with a simple 2-rule strategy. Perfect for day trading forex, crypto, stocks and indices.
-            </p>
-            <div class="subtitle-badge" data-en="✓ Works on TradingView • ✓ All Markets • ✓ Beginner Friendly" data-es="✓ Funciona en TradingView • ✓ Todos los Mercados • ✓ Fácil para Principiantes"></div>
+            <div class="version" data-en="v7 — Pine Script v6" data-es="v7 — Pine Script v6">v7 — Pine Script v6</div>
+            <h1 data-en="SMC <span>Structure</span> V7" data-es="SMC <span>Structure</span> V7">SMC <span>Structure</span> V7</h1>
+            <p data-en="Professional market structure trading system. 7-step course-aligned engine with external/internal swing logic, MTF dashboard, and session range tracking." data-es="Sistema profesional de trading de estructura de mercado. Motor alineado al curso de 7 pasos con lógica de swing externo/interno, dashboard MTF y seguimiento de sesiones.">Professional market structure trading system. 7-step course-aligned engine with external/internal swing logic, MTF dashboard, and session range tracking.</p>
+            <div class="header-badges">
+                <span data-en="📐 7-Step Course Logic" data-es="📐 Lógica del Curso de 7 Pasos">📐 7-Step Course Logic</span>
+                <span data-en="📊 MTF Dashboard" data-es="📊 Dashboard MTF">📊 MTF Dashboard</span>
+                <span data-en="🔄 External + Internal" data-es="🔄 Externo + Interno">🔄 External + Internal</span>
+                <span data-en="🎯 Session Ranges" data-es="🎯 Rangos de Sesión">🎯 Session Ranges</span>
+            </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="icon-grid">
-                <div class="icon-item">
-                    <div class="icon-circle">📊</div>
-                    <p data-en="Order Blocks" data-es="Order Blocks"><strong>Order Blocks</strong></p>
-                </div>
-                <div class="icon-item">
-                    <div class="icon-circle">📈</div>
-                    <p data-en="CVD Delta" data-es="Delta CVD"><strong>CVD Delta</strong></p>
-                </div>
-                <div class="icon-item">
-                    <div class="icon-circle">💥</div>
-                    <p data-en="Break of Structure" data-es="Ruptura de Estructura"><strong>BOS</strong></p>
-                </div>
-                <div class="icon-item">
-                    <div class="icon-circle">🎯</div>
-                    <p data-en="Fair Value Gap" data-es="Fair Value Gap"><strong>FVG</strong></p>
-                </div>
-            </div>
-            <h2 data-en="Institutional Trading — Simplified" data-es="Trading Institucional — Simplificado">Institutional Trading — Simplified</h2>
-            <p data-en="OB CVD combines Order Block detection, Break of Structure confirmation, Fair Value Gap imbalances, and Cumulative Delta Volume flow into one powerful 2-rule system." data-es="OB CVD combina la detección de Order Blocks, confirmación de Break of Structure, desequilibrios Fair Value Gap y flujo de Volumen Delta Acumulado en un sistema potente de 2 reglas."></p>
-        </div>
-    </section>
-
-    <!-- Markets Section -->
-    <section class="markets">
-        <div class="container">
-            <h2 data-en="Works Across All Markets" data-es="Funciona en Todos los Mercados">Works Across All Markets</h2>
-            <p data-en="One strategy. Every market. Same rules apply." data-es="Una estrategia. Cada mercado. Las mismas reglas aplican."></p>
-            <div class="market-grid">
-                <div class="market-card">
-                    <div class="market-icon">💱</div>
-                    <h3 data-en="Forex" data-es="Forex">Forex</h3>
-                    <p data-en="EUR/USD, GBP/USD, USD/JPY — trade the London & NY sessions" data-es="EUR/USD, GBP/USD, USD/JPY — opera las sesiones de Londres y Nueva York"></p>
-                </div>
-                <div class="market-card">
-                    <div class="market-icon">📉</div>
-                    <h3 data-es="Índices" data-en="Indices">Índices</h3>
-                    <p data-en="S&P 500, Nasdaq, DAX, FTSE — catch institutional flow in equity markets" data-es="S&P 500, Nasdaq, DAX, FTSE — atrapa el flujo institucional en mercados accieros"></p>
-                </div>
-                <div class="market-card">
-                    <div class="market-icon">🪙</div>
-                    <h3 data-en="Crypto" data-es="Criptomonedas">Crypto</h3>
-                    <p data-en="BTC, ETH, SOL, altcoins — 24/7 institutional money flows" data-es="BTC, ETH, SOL, altcoins — flujos de dinero institucionales 24/7"></p>
-                </div>
-                <div class="market-card">
-                    <div class="market-icon">📈</div>
-                    <h3 data-en="Stocks" data-es="Acciones">Stocks</h3>
-                    <p data-en="AAPL, TSLA, MSFT — trade earnings, news, and order flow" data-es="AAPL, TSLA, MSFT — opera reportes, noticias y flujo de órdenes"></p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Strategy Section -->
-    <section class="strategy">
-        <div class="container">
-            <h2 data-en="The 2-Rule Strategy" data-es="La Estrategia de 2 Reglas">The 2-Rule Strategy</h2>
-            <p data-en="Simple. Effective. No overcomplication. Just two rules to follow." data-es="Simple. Efectivo. Sin complicaciones. Solo dos reglas a seguir."></p>
-            <div class="rules-container">
-                <div class="rule-card">
-                    <div class="rule-number">1</div>
-                    <h3><span class="icon">🔍</span> <span data-en="Break of Structure (BOS)" data-es="Ruptura de Estructura (BOS)">Break of Structure (BOS)</span></h3>
-                    <ul>
-                        <li data-en="Price must break above a prior swing high (bullish) or below a prior swing low (bearish)" data-es="El precio debe romper un máximo swing previo (alcista) o un mínimo (bajista)">Price must break above a prior swing high (bullish) or below a prior swing low (bearish)</li>
-                        <li data-en="Confirmation comes from fractal detection — not just any candle close" data-es="La confirmación viene de la detección fractal — no solo cualquier cierre de vela">Confirmation comes from fractal detection — not just any candle close</li>
-                        <li class="key" data-en="This is your entry signal trigger" data-es="Este es tu disparador de señal de entrada">This is your entry signal trigger</li>
-                    </ul>
-                </div>
-                <div class="rule-card">
-                    <div class="rule-number" style="background: var(--orange);">2</div>
-                    <h3><span class="icon">📊</span> <span data-en="FVG + CVD Flow Confirmation" data-es="Confirmación FVG + Flujo CVD">FVG + CVD Flow Confirmation</span></h3>
-                    <ul>
-                        <li data-en="A Fair Value Gap must exist at or near the BOS level" data-es="Debe existir un Fair Value Gap en o el nivel BOS">A Fair Value Gap must exist at or near the BOS level</li>
-                        <li data-en="CVD (Cumulative Delta Volume) must confirm the direction — buy-side or sell-side flow" data-es="El CVD debe confirmar la dirección — flujo comprador o vendedor">CVD (Cumulative Delta Volume) must confirm the direction — buy-side or sell-side flow</li>
-                        <li class="key" data-en="Both conditions must align — BOS + FVG + CVD flow" data-es="Ambas condiciones deben alinearse — BOS + FVG + flujo CVD">Both conditions must align — BOS + FVG + CVD flow</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="how-it-works">
-        <div class="container">
-            <h2 data-en="How It Works" data-es="Cómo Funciona">How It Works</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h3 data-en="OB Fractal FVG identifies order blocks" data-es="OB Fractal FVG identifica bloques de órdenes">OB Fractal FVG identifies order blocks</h3>
-                        <p data-en="Detects 2-candle reversal patterns at key price levels, drawing rectangles where institutional orders were placed before major moves." data-es="Detecta patrones de reversión de 2 velas en niveles clave, dibujando rectángulos donde se colocaron órdenes institucionales antes de movimientos importantes.">Detects 2-candle reversal patterns at key price levels, drawing rectangles where institutional orders were placed before major moves.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h3 data-en="Fractals confirm Break of Structure" data-es="Fractales confirman la Ruptura de Estructura">Fractals confirm Break of Structure</h3>
-                        <p data-en="Williams Fractals validate that price has broken a genuine swing point — filtering out fake breaks and noise." data-es="Los Fractales de Williams validan que el precio ha roto un punto de swing genuino — filtrando rompientes falsos y ruido.">Williams Fractals validate that price has broken a genuine swing point — filtering out fake breaks and noise.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h3 data-en="FVG gaps mark imbalance zones" data-es="Las brechas FVG marcan zonas de desequilibrio">FVG gaps mark imbalance zones</h3>
-                        <p data-en="Fair Value Gaps highlight areas where price action left an unpaid auction — natural magnets for price return." data-es="Los Fair Value Gaps resaltan áreas donde la acción de precios dejó una subasta impagada — imanes naturales para el retorno del precio.">Fair Value Gaps highlight areas where price action left an unpaid auction — natural magnets for price return.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h3 data-en="CVD confirms the flow direction" data-es="El CVD confirma la dirección del flujo">CVD confirms the flow direction</h3>
-                        <p data-en="Cumulative Delta Volume shows whether buying or selling pressure is truly driving the move — no flow, no trade." data-es="El Volumen Delta Acumulado muestra si la presión de compra o venta está realmente impulsando el movimiento — sin flujo, sin operación.">Cumulative Delta Volume shows whether buying or selling pressure is truly driving the move — no flow, no trade.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Chart Preview (Carousel) -->
+    <!-- Chart Preview -->
     <div class="container">
         <div class="chart-preview">
-            <div class="carousel-container">
-                <div class="carousel-wrapper" id="chartCarousel">
-                    <img src="ETHUSDT_2026-08-11_06-05-19.png" alt="ETHUSDT Chart: OB rectangles (green/red), FVG zones with 50% lines, BOS markers, and CVD delta pane below" class="carousel-slide active">
-                    <img src="ADAUSDT_2026-08-11_06-10-56.png" alt="ADAUSDT Chart: OB rectangles (green/red), FVG zones with 50% lines, BOS markers, and CVD delta pane below" class="carousel-slide">
-                    <img src="BTCUSDT_2026-08-11_06-16-26.png" alt="BTCUSDT Chart: OB rectangles (green/red), FVG zones with 50% lines, BOS markers, and CVD delta pane below" class="carousel-slide">
-                </div>
-                <button class="carousel-nav carousel-prev" id="carouselPrev">&#10034;</button>
-                <button class="carousel-nav carousel-next" id="carouselNext">&#10034;</button>
-                <div class="carousel-dots" id="carouselDots"></div>
-            </div>
-            <p style="text-align:center;margin:0;color:#f9fafb;" data-en="Chart preview: OB rectangles (green/red), FVG zones with 50% lines, BOS markers, and CVD delta pane below" data-es="Vista previa del gráfico: rectángulos OB (verde/rojo), zonas FVG con líneas del 50%, marcadores BOS y pane de delta CVD abajo"></p>
+            <img src="BTCUSDT_2026-09-06_13-54-51.png" alt="SMC Structure V7 — BTCUSDT chart with swing levels, BOS/CHOCH markers, session ranges, and MTF dashboard" loading="lazy">
         </div>
+        <p style="text-align:center;color:var(--gray);font-size:0.9em;margin-top:-25px;" data-en="BTCUSDT H1 — External and internal swing levels with BOS/CHOCH labels, session range tracking, and info dashboard" data-es="BTCUSDT H1 — Niveles de swing externos e internos con etiquetas BOS/CHOCH, rangos de sesión y dashboard informativo">BTCUSDT H1 — External and internal swing levels with BOS/CHOCH labels, session range tracking, and info dashboard</p>
     </div>
 
-    <!-- Indicators Section -->
-    <section class="indicators">
+    <!-- Features -->
+    <section>
         <div class="container">
-            <h2 data-en="The Two Indicators" data-es="Los Dos Indicadores">The Two Indicators</h2>
-            <p data-en="OB Fractal FVG (overlay) + CVD Delta Table (separate pane) — designed to work together or independently." data-es="OB Fractal FVG (superposición) + Tabla Delta CVD (pane separado) — diseñado para trabajar juntos o independientemente."></p>
-            <div class="indicator-grid">
-                <div class="indicator-card">
-                    <h3><span class="icon">📐</span> OB Fractal FVG <span class="badge badge-green">Overlay</span></h3>
-                    <ul>
-                        <li data-en="Order Blocks with 2-candle reversal detection & body containment" data-es="Order Blocks con detección de reversión de 2 velas y contención de cuerpo">Order Blocks with 2-candle reversal detection & body containment</li>
-                        <li data-en="Bullish undercut condition (low[1] &lt; low[2]) as alternative entry" data-es="Condición de undercut alcista (low[1] &lt; low[2]) como entrada alternativa">Bullish undercut condition (low[1] &lt; low[2]) as alternative entry</li>
-                        <li data-en="Fair Value Gaps with 50% level dotted lines extending right" data-es="Fair Value Gaps con líneas discontinuas del 50% extendiéndose a la derecha">Fair Value Gaps with 50% level dotted lines extending right</li>
-                        <li data-en="Williams Fractals for BOS detection (5-bar pattern)" data-es="Fractales de Williams para detección BOS (patrón de 5 barras)">Williams Fractals for BOS detection (5-bar pattern)</li>
-                        <li data-en="OB and FVG labels inside rectangles" data-es="Etiquetas OB y FVG dentro de rectángulos">OB and FVG labels inside rectangles</li>
-                        <li data-en="Mitigation logic — boxes freeze when price enters the zone" data-es="Lógica de mitigación — las cajas se congelan cuando el precio entra en la zona">Mitigation logic — boxes freeze when price enters the zone</li>
-                    </ul>
+            <h2 class="section-title" data-en="Indicator Features" data-es="Características del Indicador">Indicator Features</h2>
+            <p class="section-sub" data-en="Full SMC implementation — swing highs/lows, external vs internal logic, BOS/CHOCH, MTF dashboard, and session ranges. All in one Pine Script v6 indicator." data-es="Implementación SMC completa — máximos/mínimos de swing, lógica externa vs interna, BOS/CHOCH, dashboard MTF y rangos de sesión. Todo en un indicador Pine Script v6.">Full SMC implementation — swing highs/lows, external vs internal logic, BOS/CHOCH, MTF dashboard, and session ranges. All in one Pine Script v6 indicator.</p>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <span class="icon">📐</span>
+                    <h3 data-en="7-Step Course Logic" data-es="Lógica del Curso de 7 Pasos">7-Step Course Logic</h3>
+                    <p data-en="Complete market structure engine faithful to the SMC course model: basic structure → CHOCH → body-close confirmation → external vs internal → 3-candle pullback → box re-anchor → multi-timeframe." data-es="Motor completo de estructura de mercado fiel al modelo del curso SMC: estructura básica → CHOCH → confirmación de cierre de cuerpo → externo vs interno → pullback de 3 velas → re-anclaje de caja → multi-timeframe.">Complete market structure engine faithful to the SMC course model: basic structure → CHOCH → body-close confirmation → external vs internal → 3-candle pullback → box re-anchor → multi-timeframe.</p>
+                    <span class="badge" data-en="CORE" data-es="NÚCLEO">CORE</span>
                 </div>
-                <div class="indicator-card">
-                    <h3><span class="icon">📊</span> CVD Delta Table <span class="badge badge-red">Pane</span></h3>
-                    <ul>
-                        <li data-en="USDT-based delta calculation (buy_vol - sell_vol)" data-es="Cálculo de delta basado en USDT (buy_vol - sell_vol)">USDT-based delta calculation (buy_vol - sell_vol)</li>
-                        <li data-en="Action words: BULL, BEAR, ABSb, ABSs, FLAT with 2-bar confirmation" data-es="Palabras de acción: BULL, BEAR, ABSb, ABSs, FLAT con confirmación de 2 barras">Action words: BULL, BEAR, ABSb, ABSs, FLAT with 2-bar confirmation</li>
-                        <li data-en="Winsorized 95th-percentile scaling prevents outlier distortion" data-es="Escala winsorizada al percentil 95 previene distorsión por atípicos">Winsorized 95th-percentile scaling prevents outlier distortion</li>
-                        <li data-en="Absorption arrows — blue (ABSb) and orange (ABSs)" data-es="Flechas de absorción — azul (ABSb) y naranja (ABSs)">Absorption arrows — blue (ABSb) and orange (ABSs)</li>
-                        <li data-en="Wick quality gate (60% default threshold)" data-es="Puerta de calidad de wick (umbral predeterminado 60%)">Wick quality gate (60% default threshold)</li>
-                        <li data-en="Per-bar table: Time, Net Delta, Buy Vol, Sell Vol, Action" data-es="Tabla por barra: Hora, Delta Neto, Vol Compra, Vol Venta, Acción">Per-bar table: Time, Net Delta, Buy Vol, Sell Vol, Action</li>
-                    </ul>
+                <div class="feature-card">
+                    <span class="icon">🔄</span>
+                    <h3 data-en="External vs Internal Swings" data-es="Swings Externos vs Internos">External vs Internal Swings</h3>
+                    <p data-en="Only external swings (box bounds) drive trend bias. Internal swings are in-range noise and do NOT collapse the box — pure course STEP 4 logic." data-es="Solo los swings externos (límites de caja) manejan el sesgo de tendencia. Los swings internos son ruido dentro del rango y NO colapsan la caja — pura lógica del PASO 4 del curso.">Only external swings (box bounds) drive trend bias. Internal swings are in-range noise and do NOT collapse the box — pure course STEP 4 logic.</p>
+                    <span class="badge" data-en="SMC PURE" data-es="SMC PURO">SMC PURE</span>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">💥</span>
+                    <h3 data-en="BOS / CHOCH Detection" data-es="Detección BOS / CHOCH">BOS / CHOCH Detection</h3>
+                    <p data-en="Break of Structure and Change of Character automatically labeled on external box breaks. Body-close only — wicks through a level = nothing (course STEP 3)." data-es="Ruptura de Estructura y Cambio de Carácter etiquetados automáticamente en rupturas de caja externa. Solo cierre de cuerpo — mecha a través de un nivel = nada (PASO 3 del curso).">Break of Structure and Change of Character automatically labeled on external box breaks. Body-close only — wicks through a level = nothing (course STEP 3).</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">📊</span>
+                    <h3 data-en="MTF Dashboard" data-es="Dashboard MTF">MTF Dashboard</h3>
+                    <p data-en="Multi-timeframe info table showing TF, BIAS, SWING HIGH, and SWING LOW for both EXTERNAL and INTERNAL structure on the chart timeframe and a HTF (default 240)." data-es="Tabla informativa multi-timeframe que muestra TF, BIAS, SWING HIGH y SWING LOW para estructura EXTERNA e INTERNA en el timeframe del gráfico y un HTF (default 240).">Multi-timeframe info table showing TF, BIAS, SWING HIGH, and SWING LOW for both EXTERNAL and INTERNAL structure on the chart timeframe and a HTF (default 240).</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">🕐</span>
+                    <h3 data-en="Session Range Tracking" data-es="Seguimiento de Rangos de Sesión">Session Range Tracking</h3>
+                    <p data-en="Asia (22:00–01:00), London (03:00–06:00), NY (08:00–11:00) UTC-3. Horizontal lines extend until mitigated. Highs/lows tracked per session with color-coded display." data-es="Asia (22:00–01:00), Londres (03:00–06:00), NY (08:00–11:00) UTC-3. Líneas horizontales se extienden hasta mitigación. Máximos/mínimos rastreados por sesión con visualización por colores.">Asia (22:00–01:00), London (03:00–06:00), NY (08:00–11:00) UTC-3. Horizontal lines extend until mitigated. Highs/lows tracked per session with color-coded display.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">🏷️</span>
+                    <h3 data-en="Structural Labels — HH/HL/LH/LL" data-es="Etiquetas Estructurales — HH/HL/LH/LL">Structural Labels — HH/HL/LH/LL</h3>
+                    <p data-en="Every confirmed swing gets a permanent HH/HL/LH/LL label in gray, positioned left of originBar. Never hidden — always visible to track market structure across timeframes." data-es="Cada swing confirmado recibe una etiqueta permanente HH/HL/LH/LL en gris, posicionada a la izquierda de originBar. Nunca se oculta — siempre visible para rastrear la estructura del mercado a través de timeframes.">Every confirmed swing gets a permanent HH/HL/LH/LL label in gray, positioned left of originBar. Never hidden — always visible to track market structure across timeframes.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">💧</span>
+                    <h3 data-en="Liquidity Levels" data-es="Niveles de Liquidez">Liquidity Levels</h3>
+                    <p data-en="Swing highs/lows act as liquidity pools. Price sweeps above prior swing high (buy-side liquidity) or below prior swing low (sell-side liquidity) before reversing. The indicator marks these structural levels where stops and liquidity cluster." data-es="Los máximos/mínimos swing actúan como pools de liquidez. El precio barre por encima del máximo swing previo (liquidez compradora) o por debajo del mínimo swing previo (liquidez vendedora) antes de revertir. El indicador marca estos niveles estructurales donde se agrupan stops y liquidez.">Swing highs/lows act as liquidity pools. Price sweeps above prior swing high (buy-side liquidity) or below prior swing low (sell-side liquidity) before reversing. The indicator marks these structural levels where stops and liquidity cluster.</p>
+                    <span class="badge" data-en="SMC KEY" data-es="CLAVE SMC">SMC KEY</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Benefits Section -->
-    <section class="benefits">
+    <!-- Smart Money Concepts -->
+    <section>
         <div class="container">
-            <h2 data-en="Why Traders Choose OB CVD" data-es="Por Qué los Operadores Eligen OB CVD">Why Traders Choose OB CVD</h2>
+            <h2 class="section-title" data-en="Smart Money Concepts" data-es="Smart Money Concepts">Smart Money Concepts</h2>
+            <p class="section-sub" data-en="Smart Money refers to institutional capital — banks, hedge funds, and professional traders who move markets. Unlike retail traders, Smart Money operates with deep liquidity, accumulates positions gradually, and triggers market moves. SMC is the framework for tracking their footprint on the chart." data-es="Smart Money se refiere al capital institucional — bancos, fondos de cobertura y traders profesionales que mueven los mercados. A diferencia del retail, Smart Money opera con liquidez profunda, acumula posiciones gradualmente y desencadena movimientos. SMC es el framework para rastrear su huella en el gráfico.">Smart Money refers to institutional capital — banks, hedge funds, and professional traders who move markets. Unlike retail traders, Smart Money operates with deep liquidity, accumulates positions gradually, and triggers market moves. SMC is the framework for tracking their footprint on the chart.</p>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <span class="icon">🏦</span>
+                    <h3 data-en="What Is Smart Money?" data-es="¿Qué es Smart Money?">What Is Smart Money?</h3>
+                    <p data-en="Institutional money that controls the market. Smart Money creates liquidity pools at swing highs/lows, sweeps retail stops, then drives price in the opposite direction. SMC Structure V7 maps these institutional footprints in real time — every swing high/low, every box break, every BOS/CHOCH is a signal of what Smart Money is doing." data-es="Dinero institucional que controla el mercado. Smart Money crea pools de liquidez en máximos/mínimos swing, barre stops del retail, y luego impulsa el precio en dirección opuesta. SMC Structure V7 mapea estas huellas institucionales en tiempo real — cada máximo/mínimo swing, cada ruptura de caja, cada BOS/CHOCH es una señal de lo que Smart Money está haciendo.">Institutional money that controls the market. Smart Money creates liquidity pools at swing highs/lows, sweeps retail stops, then drives price in the opposite direction. SMC Structure V7 maps these institutional footprints in real time — every swing high/low, every box break, every BOS/CHOCH is a signal of what Smart Money is doing.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">💧</span>
+                    <h3 data-en="Liquidity" data-es="Liquidez">Liquidity</h3>
+                    <p data-en="The fuel of Smart Money. Buy-side liquidity sits above swing highs (stop losses of short sellers). Sell-side liquidity sits below swing lows (stop losses of long buyers). Smart Money sweeps these zones to fill large orders before reversing. The indicator's external box bounds directly identify the key liquidity levels in play." data-es="El combustible de Smart Money. La liquidez compradora está sobre máximos swing (stops de vendedores). La liquidez vendedora está bajo mínimos swing (stops de compradores). Smart Money barre estas zonas para llenar órdenes grandes antes de revertir. Los límites de caja externa del indicador identifican directamente los niveles clave de liquidez en juego.">The fuel of Smart Money. Buy-side liquidity sits above swing highs (stop losses of short sellers). Sell-side liquidity sits below swing lows (stop losses of long buyers). Smart Money sweeps these zones to fill large orders before reversing. The indicator's external box bounds directly identify the key liquidity levels in play.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">🔄</span>
+                    <h3 data-en="Market Structure" data-es="Estructura de Mercado">Market Structure</h3>
+                    <p data-en="The sequence of HH/HL (uptrend) and LH/LL (downtrend) defines who controls the market. BOS confirms trend continuation — Smart Money is pushing in the same direction. CHOCH signals a potential shift — Smart Money may be reversing. The indicator auto-labels both so you read structure at a glance." data-es="La secuencia de HH/HL (tendencia alcista) y LH/LL (tendencia bajista) define quién controla el mercado. BOS confirma continuación — Smart Money empuja en la misma dirección. CHOCH señala un posible cambio — Smart Money puede estar revirtiendo. El indicador etiqueta ambos automáticamente para que leas la estructura de un vistazo.">The sequence of HH/HL (uptrend) and LH/LL (downtrend) defines who controls the market. BOS confirms trend continuation — Smart Money is pushing in the same direction. CHOCH signals a potential shift — Smart Money may be reversing. The indicator auto-labels both so you read structure at a glance.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">📦</span>
+                    <h3 data-en="Order Blocks (OB)" data-es="Order Blocks (OB)">Order Blocks (OB)</h3>
+                    <p data-en="The last candle before a strong move in the opposite direction — where Smart Money placed its orders. Our engine identifies the external box bounds which function as the key Order Block zones. When price returns to these levels, Smart Money often reacts there." data-es="La última vela antes de un movimiento fuerte en dirección opuesta — donde Smart Money colocó sus órdenes. Nuestro motor identifica los límites de caja externa que funcionan como zonas clave de Order Block. Cuando el precio regresa a estos niveles, Smart Money a menudo reacciona allí.">The last candle before a strong move in the opposite direction — where Smart Money placed its orders. Our engine identifies the external box bounds which function as the key Order Block zones. When price returns to these levels, Smart Money often reacts there.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">🔮</span>
+                    <h3 data-en="Fair Value Gap (FVG)" data-es="Fair Value Gap (FVG)">Fair Value Gap (FVG)</h3>
+                    <p data-en="An imbalance zone where price moved too fast, leaving an unpriced gap. Smart Money leaves FVGs behind as signatures of aggressive accumulation or distribution. Price tends to return to fill these gaps — they act as magnets. The 3-candle pullback rule helps identify when FVGs are likely to hold." data-es="Una zona de desequilibrio donde el precio se movió demasiado rápido, dejando un gap sin precio. Smart Money deja FVGs como firmas de acumulación o distribución agresiva. El precio tiende a regresar a llenar estos gaps — actúan como imanes. La regla de pullback de 3 velas ayuda a identificar cuándo los FVGs probablemente se mantendrán.">An imbalance zone where price moved too fast, leaving an unpriced gap. Smart Money leaves FVGs behind as signatures of aggressive accumulation or distribution. Price tends to return to fill these gaps — they act as magnets. The 3-candle pullback rule helps identify when FVGs are likely to hold.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">⚡</span>
+                    <h3 data-en="Liquidity Sweep" data-es="Barrido de Liquidez">Liquidity Sweep</h3>
+                    <p data-en="A sharp move beyond a swing high/low to trigger stop losses and capture liquidity. Smart Money needs liquidity to fill large positions — they push price to grab it, then reverse. A sweep above external high (buy-side grab) or below external low (sell-side grab) often precedes a strong directional move in the opposite direction." data-es="Un movimiento brusco más allá de un máximo/mínimo swing para activar stops y capturar liquidez. Smart Money necesita liquidez para llenar posiciones grandes — empujan el precio para obtenerla, luego revierten. Un barrido sobre el máximo externo (captura compradora) o bajo el mínimo externo (captura vendedora) a menudo precede a un fuerte movimiento direccional en dirección opuesta.">A sharp move beyond a swing high/low to trigger stop losses and capture liquidity. Smart Money needs liquidity to fill large positions — they push price to grab it, then reverse. A sweep above external high (buy-side grab) or below external low (sell-side grab) often precedes a strong directional move in the opposite direction.</p>
+                    <span class="badge" data-en="KEY PATTERN" data-es="PATRÓN CLAVE">KEY PATTERN</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Preview -->
+    <section style="padding-top:0;">
+        <div class="container">
+            <h2 class="section-title" data-en="Info Dashboard" data-es="Dashboard Informativo">Info Dashboard</h2>
+            <p class="section-sub" data-en="Real-time table shows external and internal structure state — bias, swing levels, and HTF comparison" data-es="Tabla en tiempo real muestra el estado de la estructura externa e interna — bias, niveles de swing y comparación HTF">Real-time table shows external and internal structure state — bias, swing levels, and HTF comparison</p>
+            <div class="dash-preview">
+                <div class="dash-hdr">TF</div>
+                <div class="dash-hdr">BIAS</div>
+                <div class="dash-hdr">SWING HIGH</div>
+                <div class="dash-hdr">SWING LOW</div>
+                <div class="dash-label">EXTERNAL</div>
+                <div class="dash-label"></div>
+                <div class="dash-label"></div>
+                <div class="dash-label"></div>
+                <div class="dash-val">60</div>
+                <div class="dash-val" style="color:var(--green);font-weight:600;">BULLISH</div>
+                <div class="dash-val">81478.87</div>
+                <div class="dash-val">76670.01</div>
+                <div class="dash-val">240</div>
+                <div class="dash-val" style="color:var(--red);font-weight:600;">BEARISH</div>
+                <div class="dash-val">82542.50</div>
+                <div class="dash-val">76425.00</div>
+                <div class="dash-label">INTERNAL</div>
+                <div class="dash-label"></div>
+                <div class="dash-label"></div>
+                <div class="dash-label"></div>
+                <div class="dash-val">60</div>
+                <div class="dash-val" style="color:var(--green);font-weight:600;">BULLISH</div>
+                <div class="dash-val">79400.00</div>
+                <div class="dash-val">77000.00</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Two Rule Traders Strategy -->
+    <section class="rules-bg">
+        <div class="container">
+            <h2 class="section-title" data-en="Two Rule Traders — Golden Rules" data-es="Two Rule Traders — Reglas de Oro">Two Rule Traders — Golden Rules</h2>
+            <p class="section-sub" data-en="The complete trade setup framework: direction, spot, confirmation" data-es="El marco completo de configuración de trades: dirección, punto, confirmación">The complete trade setup framework: direction, spot, confirmation</p>
+
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-num">01</div>
+                    <h3 data-en="Trend Direction — H4" data-es="Dirección de Tendencia — H4">Trend Direction — H4</h3>
+                    <ul>
+                        <li data-en="Higher timeframe bias = your trade direction" data-es="Bias de timeframe superior = dirección de tu trade">Higher timeframe bias = your trade direction</li>
+                        <li data-en="Supply / Demand zones from H4 volume profile (POC / VAH / VAL)" data-es="Zonas de Oferta / Demanda del perfil de volumen H4 (POC / VAH / VAL)">Supply / Demand zones from H4 volume profile (POC / VAH / VAL)</li>
+                        <li data-en="SWING HIGH / SWING LOW define the structural bias" data-es="SWING HIGH / SWING LOW definen el sesgo estructural">SWING HIGH / SWING LOW define the structural bias</li>
+                    </ul>
+                </div>
+                <div class="rule-card" style="border-left-color:var(--orange);">
+                    <div class="rule-num">02</div>
+                    <h3 data-en="Spot to Wait — M15 Supply/Demand" data-es="Punto de Espera — Oferta/Demanda M15">Spot to Wait — M15 Supply/Demand</h3>
+                    <ul>
+                        <li data-en="Mark FVG and OB at H4 supply/demand zones" data-es="Marca FVG y OB en zonas de oferta/demanda H4">Mark FVG and OB at H4 supply/demand zones</li>
+                        <li data-en="M15 volume profile from swing high/low — POC / VAH / VAL" data-es="Perfil de volumen M15 desde máximo/mínimo swing — POC / VAH / VAL">M15 volume profile from swing high/low — POC / VAH / VAL</li>
+                        <li data-en="Wait for price to reach the zone before acting" data-es="Espera a que el precio llegue a la zona antes de actuar">Wait for price to reach the zone before acting</li>
+                    </ul>
+                </div>
+                <div class="rule-card" style="border-left-color:var(--green);">
+                    <div class="rule-num">03</div>
+                    <h3 data-en="Confirmation — M15 CHOCH" data-es="Confirmación — CHOCH M15">Confirmation — M15 CHOCH</h3>
+                    <ul>
+                        <li data-en="CHOCH (Change of Character) on M15 confirms entry" data-es="CHOCH (Cambio de Carácter) en M15 confirma la entrada">CHOCH (Change of Character) on M15 confirms entry</li>
+                        <li data-en="High quality OB requires: BOS + FVG imbalance + liquidity sweep" data-es="OB de alta calidad requiere: BOS + desequilibrio FVG + barrido de liquidez">High quality OB requires: BOS + FVG imbalance + liquidity sweep</li>
+                        <li data-en="Enter on the M15 CHOCH confirmation" data-es="Entra en la confirmación CHOCH M15">Enter on the M15 CHOCH confirmation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Trading Sessions -->
+            <div style="margin-top:50px;">
+                <div class="sessions-box">
+                    <h3 data-en="Trading Sessions (UTC-3)" data-es="Sesiones de Trading (UTC-3)">Trading Sessions (UTC-3)</h3>
+                    <div class="session-row">
+                        <span class="session-name asia">🌏 Asia</span>
+                        <span class="session-time">22:00 — 01:00</span>
+                    </div>
+                    <div class="session-row">
+                        <span class="session-name london">🇬🇧 London</span>
+                        <span class="session-time">03:00 — 06:00</span>
+                    </div>
+                    <div class="session-row">
+                        <span class="session-name ny">🇺🇸 New York</span>
+                        <span class="session-time">08:00 — 11:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Course Steps -->
+    <section>
+        <div class="container">
+            <h2 class="section-title" data-en="The 7-Step SMC Engine" data-es="El Motor SMC de 7 Pasos">The 7-Step SMC Engine</h2>
+            <p class="section-sub" data-en="Every swing high and swing low processed through the complete course model" data-es="Cada máximo y mínimo swing procesado a través del modelo completo del curso">Every swing high and swing low processed through the complete course model</p>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <h3 data-en="Basic Structure" data-es="Estructura Básica">Basic Structure</h3>
+                        <p data-en="Swing highs/lows give directional bias: LH+LL = bearish, HH+HL = bullish. 3-candle pullback rule applied to EVERY swing." data-es="Máximos/mínimos swing dan sesgo direccional: LH+LL = bajista, HH+HL = alcista. Regla de pullback de 3 velas aplicada a CADA swing.">Swing highs/lows give directional bias: LH+LL = bearish, HH+HL = bullish. 3-candle pullback rule applied to EVERY swing.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <h3 data-en="CHOCH Detection" data-es="Detección CHOCH">CHOCH Detection</h3>
+                        <p data-en="A trend shifts when the OPPOSITE swing extreme is broken. Change of Character signals a potential reversal." data-es="Una tendencia cambia cuando se rompe el extremo swing OPUESTO. Change of Character señala una posible reversión.">A trend shifts when the OPPOSITE swing extreme is broken. Change of Character signals a potential reversal.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <h3 data-en="Body-Close Confirmation" data-es="Confirmación de Cierre de Cuerpo">Body-Close Confirmation</h3>
+                        <p data-en="A shift is confirmed only by a BODY-CLOSE beyond a live box bound. Wick through a level = nothing." data-es="Un cambio se confirma solo por un CIERRE DE CUERPO más allá del límite de caja vivo. Mecha a través de un nivel = nada.">A shift is confirmed only by a BODY-CLOSE beyond a live box bound. Wick through a level = nothing.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <h3 data-en="External vs Internal" data-es="Externo vs Interno">External vs Internal</h3>
+                        <p data-en="Only EXTERNAL swings (the box bounds) move the trend. In-range swings are INTERNAL noise and must NOT collapse the box." data-es="Solo los swings EXTERNOS (límites de caja) mueven la tendencia. Los swings dentro del rango son ruido INTERNO y NO deben colapsar la caja.">Only EXTERNAL swings (the box bounds) move the trend. In-range swings are INTERNAL noise and must NOT collapse the box.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">5</div>
+                    <div class="step-content">
+                        <h3 data-en="3-Candle Pullback (Golden Rule)" data-es="Pullback de 3 Velas (Regla de Oro)">3-Candle Pullback (Golden Rule)</h3>
+                        <p data-en="3 candles that each break the prior candle in the OPPOSING direction to the trend. Non-consecutive, BODY-CLOSE only, wicks ignored." data-es="3 velas que cada una rompe la vela anterior en la dirección OPUESTA a la tendencia. No consecutivas, solo CIERRE DE CUERPO, mechas ignoradas.">3 candles that each break the prior candle in the OPPOSING direction to the trend. Non-consecutive, BODY-CLOSE only, wicks ignored.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">6</div>
+                    <div class="step-content">
+                        <h3 data-en="Box Re-Anchor" data-es="Re-anclaje de Caja">Box Re-Anchor</h3>
+                        <p data-en="On a confirmed box break, the box re-anchors to the current confirmed swing pivot — never a whole-window extreme scan." data-es="En una ruptura de caja confirmada, la caja se re-ancla al pivote swing confirmado actual — nunca un escaneo extremo de toda la ventana.">On a confirmed box break, the box re-anchors to the current confirmed swing pivot — never a whole-window extreme scan.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">7</div>
+                    <div class="step-content">
+                        <h3 data-en="Multi-Timeframe" data-es="Multi-Timeframe">Multi-Timeframe</h3>
+                        <p data-en="Higher TF bias takes precedence. Range-anchored MTF rows in the info dashboard for comparison. HTF default: 240." data-es="El bias del TF superior tiene prioridad. Filas MTF ancladas por rango en el dashboard informativo para comparación. HTF default: 240.">Higher TF bias takes precedence. Range-anchored MTF rows in the info dashboard for comparison. HTF default: 240.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits -->
+    <section style="padding-top:0;">
+        <div class="container">
+            <h2 class="section-title" data-en="Why SMC Structure V7" data-es="Por Qué SMC Structure V7">Why SMC Structure V7</h2>
+            <p class="section-sub" data-en="Built for traders who want institutional-grade market structure analysis" data-es="Construido para traders que quieren análisis de estructura de mercado de grado institucional">Built for traders who want institutional-grade market structure analysis</p>
             <div class="benefit-grid">
                 <div class="benefit-item">
-                    <div class="benefit-icon">🎯</div>
-                    <div class="benefit-content">
-                        <h3 data-en="Two Simple Rules" data-es="Dos Reglas Simples">Two Simple Rules</h3>
-                        <p data-en="No complex indicators. No confusing signals. Just BOS + FVG + CVD flow confirmation." data-es="Sin indicadores complejos. Sin señalesconfusas. Solo BOS + FVG + confirmación de flujo CVD.">No complex indicators. No confusing signals. Just BOS + FVG + CVD flow confirmation.</p>
-                    </div>
+                    <div class="icon">🎯</div>
+                    <h3 data-en="Course Aligned" data-es="Alineado al Curso">Course Aligned</h3>
+                    <p data-en="Faithful to the Complete Market Structure Trading Course model. No deviations, no interpretations." data-es="Fiel al modelo del Curso Completo de Estructura de Mercado. Sin desviaciones, sin interpretaciones.">Faithful to the Complete Market Structure Trading Course model. No deviations, no interpretations.</p>
                 </div>
                 <div class="benefit-item">
-                    <div class="benefit-icon">🔍</div>
-                    <div class="benefit-content">
-                        <h3 data-en="Flow-Filtered Entries" data-es="Entradas Filtradas por Flujo">Flow-Filtered Entries</h3>
-                        <p data-en="CVD ensures you only trade in the direction of real institutional flow." data-es="El CVD asegura que solo operas en la dirección del flujo institucional real.">CVD ensures you only trade in the direction of real institutional flow.</p>
-                    </div>
+                    <div class="icon">🔍</div>
+                    <h3 data-en="External + Internal" data-es="Externo + Interno">External + Internal</h3>
+                    <p data-en="Separate external box bounds (trend-biasing) from internal swing noise. Clean structure reading." data-es="Separa los límites de caja externos (sesgo de tendencia) del ruido de swing interno. Lectura limpia de estructura.">Separate external box bounds (trend-biasing) from internal swing noise. Clean structure reading.</p>
                 </div>
                 <div class="benefit-item">
-                    <div class="benefit-icon">🚫</div>
-                    <div class="benefit-content">
-                        <h3 data-en="No Repainting" data-es="Sin Repintado">No Repainting</h3>
-                        <p data-en="All signals based on confirmed bars — what you see is what happened." data-es="Todas las señales basadas en barras confirmadas — lo que ves es lo que pasó.">All signals based on confirmed bars — what you see is what happened.</p>
-                    </div>
+                    <div class="icon">📊</div>
+                    <h3 data-en="MTF Dashboard" data-es="Dashboard MTF">MTF Dashboard</h3>
+                    <p data-en="Compare chart TF vs HTF structure state side-by-side in one compact table." data-es="Compara el estado de estructura del TF del gráfico vs HTF lado a lado en una tabla compacta.">Compare chart TF vs HTF structure state side-by-side in one compact table.</p>
                 </div>
                 <div class="benefit-item">
-                    <div class="benefit-icon">📱</div>
-                    <div class="benefit-content">
-                        <h3 data-en="All Markets Covered" data-es="Todos los Mercados">All Markets Covered</h3>
-                        <p data-en="Forex, crypto, stocks, indices — same 2-rule strategy works everywhere." data-es="Forex, cripto, acciones, índices — la misma estrategia de 2 reglas funciona en todas partes.">Forex, crypto, stocks, indices — same 2-rule strategy works everywhere.</p>
-                    </div>
+                    <div class="icon">🕐</div>
+                    <h3 data-en="Session Context" data-es="Contexto de Sesión">Session Context</h3>
+                    <p data-en="Asia, London, NY ranges with horizontal lines — know which session is driving price action." data-es="Rangos de Asia, Londres, NY con líneas horizontales — sabé qué sesión está impulsando la acción del precio.">Asia, London, NY ranges with horizontal lines — know which session is driving price action.</p>
                 </div>
                 <div class="benefit-item">
-                    <div class="benefit-icon">⚡</div>
-                    <div class="benefit-content">
-                        <h3 data-en="Beginner Friendly" data-es="Fácil para Principiantes">Beginner Friendly</h3>
-                        <p data-en="Learn the 2-rule system in under 15 minutes. Start trading immediately." data-es="Aprende el sistema de 2 reglas en menos de 15 minutos. Empieza a operar inmediatamente.">Learn the 2-rule system in under 15 minutes. Start trading immediately.</p>
-                    </div>
+                    <div class="icon">🚫</div>
+                    <h3 data-en="No Repainting" data-es="Sin Repintado">No Repainting</h3>
+                    <p data-en="All signals on confirmed bars only. What you see is what happened — no lookahead bias." data-es="Todas las señales solo en barras confirmadas. Lo que ves es lo que pasó — sin sesgo de lookahead.">All signals on confirmed bars only. What you see is what happened — no lookahead bias.</p>
                 </div>
                 <div class="benefit-item">
-                    <div class="benefit-icon">🛡️</div>
-                    <div class="benefit-content">
-                        <h3 data-en="Risk Controlled" data-es="Riesgo Controlado">Risk Controlled</h3>
-                        <p data-en="Built-in stop loss zones (OB/FVG boundaries) and mitigation feedback." data-es="Zonas de stop loss integradas (límites OB/FVG) y retroalimentación de mitigación.">Built-in stop loss zones (OB/FVG boundaries) and mitigation feedback.</p>
-                    </div>
+                    <div class="icon">⚡</div>
+                    <h3 data-en="Pine Script v6" data-es="Pine Script v6">Pine Script v6</h3>
+                    <p data-en="Modern arrays, loops, and structs. Max 500 lines/labels. Optimized for speed and reliability." data-es="Arrays modernos, loops y structs. Máximo 500 líneas/labels. Optimizado para velocidad y confiabilidad.">Modern arrays, loops, and structs. Max 500 lines/labels. Optimized for speed and reliability.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta">
-        <h2 data-en="Ready to Trade Institutional Flow?" data-es="¿Listo para Operar Flujo Institucional?">Ready to Trade Institutional Flow?</h2>
-        <p data-en="Join the TwoRuleTrader community. Buy for USDT 100 on BSC BEP20 to receive the complete OB CVD indicator set, private community group, priority support, and weekly live day trading sessions valid for 30 days." data-es="Únete a la comunidad TwoRuleTrader. Compra por USDT 100 en BSC BEP20 para recibir el conjunto completo de indicadores OB CVD, grupo comunitario privado, soporte prioritario y sesiones semanales en vivo de day trading valido por 30 days.">
-            Join the TwoRuleTrader community. Buy for USDT 100 on BSC BEP20 to receive the complete OB CVD indicator set, private community group, priority support, and weekly live day trading sessions valid for 30 days.
-        </p>
-        <p data-en="✓ OB Fractal FVG indicator (TradingView Pine Script v6)" data-es="✓ Indicador OB Fractal FVG (Pine Script v6 para TradingView)">✓ OB Fractal FVG indicator (TradingView Pine Script v6)</p>
-        <p data-en="✓ CVD Delta Table indicator (Pine Script v6)" data-es="✓ Tabla Delta CVD (Pine Script v6)">✓ CVD Delta Table indicator (Pine Script v6)</p>
-        <p data-en="✓ Private Telegram community group access" data-es="✓ Acceso al grupo comunitario privado de Telegram">✓ Private Telegram community group access</p>
-        <p data-en="✓ Priority support & trade reviews" data-es="✓ Soporte prioritario y revisiones de operaciones">✓ Priority support & trade reviews</p>
-        <p data-en="✓ Weekly live day trading sessions" data-es="✓ Sesiones semanales en vivo de day trading">✓ Weekly live day trading sessions</p>
-        <a href="deposit_OKX_WALLET.html" class="cta-button" data-en="Buy Now — USDT 100 →" data-es="Comprar Ahora — USDT 100 →">Buy Now — USDT 100 →</a>
-    </section>
-
-    <!-- Reference Guide Links -->
+    <!-- CTA -->
     <div class="container">
-        <div class="ref-links">
-            <a href="OB_FRACTAL_FVG_GUIDE_EN.html" target="blank" class="ref-link en" data-en="📖 English Guide" data-es="📖 Guía en Inglés">
-                <span class="ref-icon">📖</span>
-                <span class="ref-text" data-en="English Reference Guide" data-es="Guía de Referencia en Inglés">English Reference Guide</span>
-            </a>
-            <a href="OB_FRACTAL_FVG_GUIDE_ES.html" target="blank" class="ref-link es" data-en="📖 Spanish Guide" data-es="📖 Guía en Español">
-                <span class="ref-icon">📖</span>
-                <span class="ref-text" data-en="Spanish Reference Guide" data-es="Guía de Referencia en Español">Spanish Reference Guide</span>
-            </a>
+        <div class="cta">
+            <h2 data-en="Ready to Trade with SMC Structure V7?" data-es="¿Listo para Operar con SMC Structure V7?">Ready to Trade with SMC Structure V7?</h2>
+            <p data-en="Join the TwoRuleTrader community. Get the SMC Structure V7 indicator, the trading framework, and full support." data-es="Unite a la comunidad TwoRuleTrader. Obtené el indicador SMC Structure V7, el framework de trading y soporte completo.">Join the TwoRuleTrader community. Get the SMC Structure V7 indicator, the trading framework, and full support.</p>
+            <div class="cta-features">
+                <span data-en="SMC Structure V7 indicator" data-es="Indicador SMC Structure V7">SMC Structure V7 indicator</span>
+                <span data-en="Two Rule Traders framework" data-es="Framework Two Rule Traders">Two Rule Traders framework</span>
+                <span data-en="Private Telegram group" data-es="Grupo privado de Telegram">Private Telegram group</span>
+                <span data-en="30-day validity" data-es="Validez 30 días">30-day validity</span>
+            </div>
+            <a href="deposit_OKX_WALLET.html" class="cta-button" data-en="Get Access — USDT 100 →" data-es="Obtener Acceso — USDT 100 →">Get Access — USDT 100 →</a>
         </div>
     </div>
 
     <!-- Footer -->
     <footer>
-        <p data-en="OB CVD Trading System — Pine Script v6 & v5 for TradingView" data-es="Sistema de Trading OB CVD — Pine Script v6 y v5 para TradingView">OB CVD Trading System — Pine Script v6 & v5 for TradingView</p>
+        <p data-en="SMC Structure V7 — Pine Script v6 for TradingView" data-es="SMC Structure V7 — Pine Script v6 para TradingView">SMC Structure V7 — Pine Script v6 for TradingView</p>
         <p data-en="Works on forex, crypto, stocks, and indices charts" data-es="Funciona en gráficos de forex, cripto, acciones e índices">Works on forex, crypto, stocks, and indices charts</p>
         <a href="https://www.instagram.com/tworuletrader" target="_blank" class="social-link">
             <img src="insta.jpg" alt="Instagram" class="social-icon">
@@ -510,101 +493,20 @@
 
     <script>
         function setLang(lang) {
-            const btnEN = document.getElementById('btnEN');
-            const btnES = document.getElementById('btnES');
-            if (lang === 'en') {
-                btnEN.classList.add('active');
-                btnES.classList.remove('active');
-            } else {
-                btnES.classList.add('active');
-                btnEN.classList.remove('active');
-            }
+            document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+            document.getElementById('btnES').classList.toggle('active', lang === 'es');
 
-            const elements = document.querySelectorAll('[data-en]');
-            elements.forEach(el => {
-                if (lang === 'en') {
-                    el.textContent = el.getAttribute('data-en');
-                } else {
-                    el.textContent = el.getAttribute('data-es');
-                }
-            });
-
-            // Handle HTML elements with line breaks
-            const brElements = document.querySelectorAll('[data-en-br]');
-            brElements.forEach(el => {
-                if (lang === 'en') {
-                    el.innerHTML = el.getAttribute('data-en-br');
-                } else {
-                    el.innerHTML = el.getAttribute('data-es-br');
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const val = lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-es');
+                if (val && (val.includes('<') || val.includes('&'))) {
+                    el.innerHTML = val;
+                } else if (val) {
+                    el.textContent = val;
                 }
             });
         }
-
-        // Set default language based on browser
         const browserLang = navigator.language.startsWith('es') ? 'es' : 'en';
         setLang(browserLang);
-
-        // Chart Carousel
-        (function() {
-            const carousel = document.getElementById('chartCarousel');
-            const slides = carousel.querySelectorAll('.carousel-slide');
-            const prevBtn = document.getElementById('carouselPrev');
-            const nextBtn = document.getElementById('carouselNext');
-            const dotsContainer = document.getElementById('carouselDots');
-            let currentSlide = 0;
-            let slideInterval;
-
-            function updateDots() {
-                dotsContainer.innerHTML = '';
-                slides.forEach((_, i) => {
-                    const dot = document.createElement('div');
-                    dot.classList.add('carousel-dot');
-                    if (i === currentSlide) dot.classList.add('active');
-                    dot.onclick = () => goToSlide(i);
-                    dotsContainer.appendChild(dot);
-                });
-            }
-
-            function updateSlides() {
-                slides.forEach((s, i) => {
-                    s.classList.toggle('active', i === currentSlide);
-                });
-                updateDots();
-            }
-
-            function goToSlide(index) {
-                currentSlide = (index + slides.length) % slides.length;
-                updateSlides();
-                resetInterval();
-            }
-
-            function nextSlide() {
-                currentSlide = (currentSlide + 1) % slides.length;
-                updateSlides();
-                resetInterval();
-            }
-
-            function prevSlide() {
-                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-                updateSlides();
-                resetInterval();
-            }
-
-            function startInterval() {
-                slideInterval = setInterval(nextSlide, 5000);
-            }
-
-            function resetInterval() {
-                clearInterval(slideInterval);
-                startInterval();
-            }
-
-            prevBtn.onclick = prevSlide;
-            nextBtn.onclick = nextSlide;
-
-            updateDots();
-            startInterval();
-        })();
     </script>
 </body>
 </html>
