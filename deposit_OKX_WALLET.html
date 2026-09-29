@@ -48,7 +48,7 @@
   <p class="subtitle">Send USDT on Binance Smart Chain (BEP20) — Subscription: 100 USDT</p>
   <div class="amount-input-group">
     <label for="depositAmount">Amount to receive (USDT):</label>
-    <input type="number" id="depositAmount" placeholder="e.g. 100" step="0.01" min="0.01" value="100">
+    <input type="number" id="depositAmount" placeholder="e.g. 100" step="0.01" min="0.01">
     <button class="update-qr-btn" onclick="updateQR()">Update QR Code</button>
   </div>
   <div id="qrcode"></div>
@@ -75,7 +75,7 @@
   </div>
   <div id="copyToast" style="position:fixed;bottom:40px;background:rgba(0,0,0,0.8);color:white;padding:12px 24px;border-radius:8px;z-index:10000;display:none;">Copied!</div>
   <div class="progress"><div class="bar"></div></div>
-  <div class="btn-primary" id="restartBtn" style="background:#16a34a;color:white;padding:12px 30px;border:none;border-radius:30px;font-size:16px;cursor:pointer;margin-top:20px;" "><a href="https://es.tradingview.com/script/hlpn8ztd/">get Indicator</a></div>
+  <div class="btn-primary" id="restartBtn" style="background:#16a34a;color:white;padding:12px 30px;border:none;border-radius:30px;font-size:16px;cursor:pointer;margin-top:20px;" "><a href="https://es.tradingview.com/script/ugEEalDk/">get Indicator</a></div>
 </div>
 <script>
 // ============================================================================
@@ -142,7 +142,7 @@ function generateSubscriptionKey(s){
   const USDT_CONTRACT   = "0x55d398326f99059ff775485246999027b3197955";
   const CHAIN_ID        = "56";
   const BSC_RPC         = "https://shared.us-east-1.getblock.io/5edc185c510647bea4316a74bd20a4d2";
-  const MORALIS_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjA0MGRhZmJmLWI4Y2YtNGE3Yi1iMTg5LTZhOTc1YTMzMGUyNSIsIm9yZ0lkIjoiOTg3NTMiLCJ1c2VySWQiOiI5ODM5OSIsInR5cGVJZCI6IjhjZTdlZjE3LTk2MTktNDlkNi1iZWQ0LWRhNDlhNDQ2YmY0NyIsInR5cGUiOiJQUk9KRUNUIiwiaWF0IjoxNjgyNjk5NTMyLCJleHAiOjQ4Mzg0NTk1MzJ9.LdRgqHzZjm-X9r9Yj2aL_6jKw0V1IFxqXWO8B8VUkYo";
+  const ALCHEMY_RPC     = "https://bnb-mainnet.g.alchemy.com/v2/RJzQWVQXFb43cnZJuutMB";
   const STORAGE_KEY = "usdt_bal";
 
   // --- Subscription settings ---
@@ -169,25 +169,44 @@ function getMessage(a) {
 let lastCelebratedBalance = 0;
 let firstCheckDone = false;
 
-// Extract sender detection using Moralis API for reliable, clean sender extraction
+// Extract sender detection using Alchemy API for reliable, clean sender extraction
 // Returns { senderAddress, txHash, depositAmount } or null
 async function detectSenderInfo() {
   let senderAddress = "";
   let txHash = "";
   let depositAmount = 0;
 
-  const moralisUrl = `https://deep-index.moralis.io/api/v2.2/wallets/${DEPOSIT_ADDRESS}/history?chain=bsc&order=DESC&limit=20`;
+  // Use Alchemy's alchemy_getAssetTransfers to get USDT transfers received by the deposit address
+  const alchemyUrl = `${ALCHEMY_RPC}`;
 
-  // Retry up to 3 times for intermittent Moralis failures
+  // Retry up to 3 times for intermittent Alchemy failures
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      console.log(`Moralis sender detection attempt ${attempt}...`);
-      const moralisResp = await fetch(moralisUrl, {
-        headers: { "X-API-Key": MORALIS_API_KEY }
+      console.log(`Alchemy sender detection attempt ${attempt}...`);
+      
+      // Build the alchemy_getAssetTransfers payload
+      const payload = {
+        jsonrpc: "2.0",
+        id: 1,
+        method: "alchemy_getAssetTransfers",
+        params: [{
+          fromBlock: "0x0",
+          toAddress: DEPOSIT_ADDRESS,
+          contractAddresses: [USDT_CONTRACT],
+          category: ["erc20"],
+          maxCount: "0x14", // 20 in hex
+          order: "desc"
+        }]
+      };
+
+      const alchemyResp = await fetch(alchemyUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
 
-      if (!moralisResp.ok) {
-        console.log(`Moralis HTTP ${moralisResp.status}: ${moralisResp.statusText}`);
+      if (!alchemyResp.ok) {
+        console.log(`Alchemy HTTP ${alchemyResp.status}: ${alchemyResp.statusText}`);
         if (attempt < 3) {
           await new Promise(r => setTimeout(r, 2000 * attempt));
           continue;
@@ -195,30 +214,28 @@ async function detectSenderInfo() {
         break;
       }
 
-      const moralisData = await moralisResp.json();
+      const alchemyData = await alchemyResp.json();
 
-      if (moralisData && moralisData.result) {
-        // Search through transactions for USDT transfers received by the deposit address
-        for (const tx of moralisData.result) {
-          const erc20Transfers = tx.erc20_transfers || [];
-          for (const transfer of erc20Transfers) {
-            const isUSDT = transfer.token_symbol === "USDT";
-            const isToUs = transfer.to_address && transfer.to_address.toLowerCase() === DEPOSIT_ADDRESS;
-            const isReceive = transfer.direction === "receive" || transfer.direction === "incoming";
-            if (isUSDT && isToUs && isReceive) {
-              senderAddress = transfer.from_address || "";
-              txHash = tx.hash || transfer.transaction_hash || "";
-              depositAmount = parseFloat(transfer.value_formatted || transfer.value || "0");
-              console.log("Found sender via Moralis:", senderAddress, "amount:", depositAmount, "txHash:", txHash);
-              return { senderAddress, txHash, depositAmount };
-            }
+      if (alchemyData && alchemyData.result && alchemyData.result.transfers) {
+        // Search through transfers for USDT received by the deposit address
+        for (const transfer of alchemyData.result.transfers) {
+          const isUSDT = transfer.rawContract && transfer.rawContract.address && 
+                        transfer.rawContract.address.toLowerCase() === USDT_CONTRACT.toLowerCase();
+          const isToUs = transfer.to && transfer.to.toLowerCase() === DEPOSIT_ADDRESS;
+          
+          if (isUSDT && isToUs) {
+            senderAddress = transfer.from || "";
+            txHash = transfer.hash || "";
+            // value is in wei, convert to USDT (18 decimals)
+            depositAmount = parseFloat(transfer.value) / 1e18;
+            console.log("Found sender via Alchemy:", senderAddress, "amount:", depositAmount, "txHash:", txHash);
+            return { senderAddress, txHash, depositAmount };
           }
-          if (senderAddress) break;
         }
       }
       break;
     } catch (fetchErr) {
-      console.log(`Moralis attempt ${attempt} failed:`, fetchErr.message || fetchErr);
+      console.log(`Alchemy attempt ${attempt} failed:`, fetchErr.message || fetchErr);
       if (attempt < 3) {
         await new Promise(r => setTimeout(r, 2000 * attempt));
       }
