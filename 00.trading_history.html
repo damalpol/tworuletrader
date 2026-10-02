@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trading History Dashboard</title>
+<style>
+:root{--bg:#0b1020;--p:#111827;--p2:#172033;--l:#263247;--t:#e8eef8;--m:#8fa0b8;--g:#28c76f;--r:#ff5b6e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:14px system-ui,Arial}.wrap{max-width:1500px;margin:auto;padding:22px}
+.top{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}.sub,small{color:var(--m)}h1{margin:0 0 4px}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}input,button,.drop{background:var(--p);color:var(--t);border:1px solid var(--l);border-radius:8px;padding:9px}.drop{border-style:dashed;color:var(--m)}
+.status{margin:14px 0;padding:10px;border:1px solid var(--l);border-radius:8px;background:var(--p)}.status.ok{border-color:#236c49}.status.err{border-color:#7a2f3a;color:#ff9aa5}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:11px}.card,.section{background:var(--p);border:1px solid var(--l);border-radius:10px}.card{padding:14px;min-height:88px}.label{color:var(--m);font-size:11px;text-transform:uppercase}.value{font-size:21px;font-weight:700;margin-top:7px}
+.green{color:var(--g)!important}.red{color:var(--r)!important}.section{padding:15px;margin-top:15px}.section h2{font-size:16px;margin:0 0 12px}
+.charts,.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}.chart{height:300px}.chart canvas{width:100%;height:100%}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:720px}th,td{padding:9px;border-bottom:1px solid var(--l);text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}th{color:var(--m);font-size:11px;text-transform:uppercase}.empty{text-align:center;color:var(--m);padding:28px}
+.month-grid{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px}
+.month-cell{border:1px solid var(--l);border-radius:10px;padding:14px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between}
+.month-cell.positive{background:rgba(40,199,111,.22);border-color:rgba(40,199,111,.65)}
+.month-cell.negative{background:rgba(255,91,110,.22);border-color:rgba(255,91,110,.65)}
+.month-cell.flat{background:var(--p2)}
+.month-name{font-size:15px;font-weight:700}
+.month-pnl{font-size:25px;font-weight:800;margin:8px 0}
+.month-meta{display:grid;grid-template-columns:1fr 1fr;gap:7px 12px;font-size:12px}
+.month-meta span{color:var(--m)}
+.month-meta b{display:block;color:var(--t);font-size:13px;margin-top:2px}
+@media(max-width:1050px){.month-grid{grid-template-columns:repeat(3,minmax(180px,1fr))}}
+@media(max-width:700px){.month-grid{grid-template-columns:repeat(2,minmax(150px,1fr))}}
+@media(max-width:450px){.month-grid{grid-template-columns:1fr}}
+
+@media(max-width:1050px){.grid{grid-template-columns:repeat(3,1fr)}.charts,.two{grid-template-columns:1fr}}@media(max-width:600px){.grid{grid-template-columns:repeat(2,1fr)}.wrap{padding:10px}}
+</style></head>
+<body><div class="wrap">
+<div class="top"><div><h1>Trading History Dashboard</h1><div class="sub">CSV is processed locally in your browser.</div></div>
+<div class="controls"><input id="file" type="file" accept=".csv,text/csv"><input id="capital" type="number" min="0" step=".01" placeholder="Starting capital"><button id="reset">Reset</button><div id="drop" class="drop">Drop CSV here</div></div></div>
+<div id="status" class="status">Select a CSV file to load your trading history.</div>
+<div class="grid">
+<div class="card"><div class="label">Net P&amp;L</div><div id="net" class="value">—</div></div>
+<div class="card"><div class="label">Return</div><div id="ret" class="value">—</div></div>
+<div class="card"><div class="label">Win Rate</div><div id="wr" class="value">—</div></div>
+<div class="card"><div class="label">Profit Factor</div><div id="pf" class="value">—</div></div>
+<div class="card"><div class="label">Max Drawdown</div><div id="dd" class="value">—</div></div>
+<div class="card"><div class="label">Fees</div><div id="fees" class="value">—</div></div></div>
+<div class="grid" style="margin-top:11px">
+<div class="card"><div class="label">Trading Volume</div><div id="volume" class="value">—</div></div>
+<div class="card"><div class="label">Closed Trades</div><div id="trades" class="value">—</div></div>
+<div class="card"><div class="label">Winning Trades</div><div id="wins" class="value">—</div></div>
+<div class="card"><div class="label">Losing Trades</div><div id="losses" class="value">—</div></div>
+<div class="card"><div class="label">Average Win</div><div id="avgwin" class="value">—</div></div>
+<div class="card"><div class="label">Average Loss</div><div id="avgloss" class="value">—</div></div></div>
+<div class="section"><h2>Performance Charts</h2><div class="charts"><div class="chart"><canvas id="cum"></canvas></div><div class="chart"><canvas id="daily"></canvas></div></div></div>
+<div class="section"><h2>Daily Performance</h2><div id="dailyTable" class="tablewrap"><div class="empty">Load a CSV to see daily performance.</div></div></div>
+<div class="section"><h2>Monthly P&amp;L</h2><div id="monthlyTable" class="tablewrap"><div class="empty">Load a CSV to see monthly P&amp;L.</div></div></div>
+<div class="two"><div class="section"><h2>Long / Short</h2><div id="sideTable" class="tablewrap"></div></div><div class="section"><h2>Coin Performance</h2><div id="coinTable" class="tablewrap"></div></div></div>
+</div>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);let rows=[],dailyData=[];
+$("capital").value=localStorage.getItem("trading_dashboard_capital")||"";
+$("capital").oninput=()=>{localStorage.setItem("trading_dashboard_capital",$("capital").value);if(rows.length)render()};
+function num(v){let n=Number(String(v??"").replace(/,/g,"").trim());return Number.isFinite(n)?n:0}
+function dateObj(v){
+ let s=String(v??"").trim(),m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*-\s*(\d{1,2}):(\d{2}):(\d{2})$/);
+ if(m){let d=new Date(+m[3],+m[1]-1,+m[2],+m[4],+m[5],+m[6]);return isNaN(d.getTime())?null:d}
+ let d=new Date(s);return isNaN(d.getTime())?null:d
+}
+function parseCSV(text){
+ text=text.replace(/^\uFEFF/,"").replace(/\r\n/g,"\n").replace(/\r/g,"\n");let lines=text.split("\n").filter(x=>x.trim());
+ if(!lines.length)return[];function line(s){let a=[],c="",q=false;for(let i=0;i<s.length;i++){let x=s[i];if(x=='"'){if(q&&s[i+1]=='"'){c+='"';i++}else q=!q}else if(x==','&&!q){a.push(c);c=""}else c+=x}a.push(c);return a}
+ let h=line(lines[0]).map(x=>x.trim().replace(/^\uFEFF/,"").toLowerCase());
+ return lines.slice(1).map(s=>{let v=line(s),o={};h.forEach((k,i)=>o[k]=(v[i]??"").trim());return o})
+}
+const close=r=>/close/i.test(r.dir||"");const side=r=>(r.dir||"").toLowerCase().includes("long")?"Long":(r.dir||"").toLowerCase().includes("short")?"Short":"Other";
+const money=v=>Number(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct=v=>Number.isFinite(v)?v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})+"%":"—";
+const cls=v=>v>0?"green":v<0?"red":"";
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+function status(s,c=""){$("status").className="status "+c;$("status").textContent=s}
+function build(raw){
+ rows=raw.map(r=>({...r,_date:dateObj(r.time),_ntl:num(r.ntl),_fee:num(r.fee),_pnl:num(r.closedpnl),_side:side(r)})).filter(r=>r._date).sort((a,b)=>a._date-b._date);
+ if(!rows.length)throw Error("No valid rows found. The expected time format is like 8/22/2026 - 02:10:23.");
+}
+function render(){
+ let closed=rows.filter(close),pnl=closed.reduce((a,r)=>a+r._pnl,0),fees=rows.reduce((a,r)=>a+r._fee,0),vol=rows.reduce((a,r)=>a+r._ntl,0);
+ let wins=closed.filter(r=>r._pnl>0),losses=closed.filter(r=>r._pnl<0),gw=wins.reduce((a,r)=>a+r._pnl,0),gl=Math.abs(losses.reduce((a,r)=>a+r._pnl,0)),cap=num($("capital").value);
+ let set=(id,v,c="")=>{$(id).textContent=v;$(id).className="value "+c};
+ set("net",money(pnl),cls(pnl));set("ret",pct(cap?pnl/cap*100:NaN),cls(pnl));set("wr",closed.length?pct(wins.length/closed.length*100):"—");set("pf",gl?(gw/gl).toFixed(2):"—");set("fees",money(fees));set("volume",money(vol));set("trades",closed.length);set("wins",wins.length);set("losses",losses.length);set("avgwin",wins.length?money(gw/wins.length):"—");set("avgloss",losses.length?money(-gl/losses.length):"—");
+ let d={};rows.forEach(r=>{let k=r._date.getFullYear()+"-"+String(r._date.getMonth()+1).padStart(2,"0")+"-"+String(r._date.getDate()).padStart(2,"0");d[k]??={date:k,pnl:0,volume:0,fees:0,trades:0,w:0,l:0};d[k].volume+=r._ntl;d[k].fees+=r._fee;if(close(r)){d[k].pnl+=r._pnl;d[k].trades++;if(r._pnl>0)d[k].w++;if(r._pnl<0)d[k].l++}});
+ dailyData=Object.values(d).sort((a,b)=>a.date.localeCompare(b.date));
+  let m={};
+  rows.forEach(r=>{
+    let k=r._date.getFullYear()+"-"+String(r._date.getMonth()+1).padStart(2,"0");
+    m[k]??={month:k,pnl:0,volume:0,fees:0,trades:0,w:0,l:0};
+    m[k].volume+=r._ntl;
+    m[k].fees+=r._fee;
+    if(close(r)){
+      m[k].pnl+=r._pnl;
+      m[k].trades++;
+      if(r._pnl>0)m[k].w++;
+      if(r._pnl<0)m[k].l++;
+    }
+  });
+  let monthlyData=Object.values(m).sort((a,b)=>a.month.localeCompare(b.month));
+  $("monthlyTable").innerHTML='<div class="month-grid">'+
+    monthlyData.map(x=>{
+      let r=cap?x.pnl/cap*100:NaN;
+      let state=x.pnl>0?"positive":x.pnl<0?"negative":"flat";
+      let label=new Date(+x.month.slice(0,4),+x.month.slice(5,7)-1,1)
+        .toLocaleDateString(undefined,{month:"long",year:"numeric"});
+      return `<div class="month-cell ${state}">
+        <div>
+          <div class="month-name">${esc(label)}</div>
+          <div class="month-pnl ${cls(x.pnl)}">${money(x.pnl)}</div>
+        </div>
+        <div class="month-meta">
+          <div><span>Return</span><b class="${cls(r)}">${pct(r)}</b></div>
+          <div><span>Trades</span><b>${x.trades}</b></div>
+          <div><span>Wins / Losses</span><b>${x.w} / ${x.l}</b></div>
+          <div><span>Win Rate</span><b>${x.trades?pct(x.w/x.trades*100):"—"}</b></div>
+          <div><span>Volume</span><b>${money(x.volume)}</b></div>
+          <div><span>Fees</span><b>${money(x.fees)}</b></div>
+        </div>
+      </div>`
+    }).join("")+
+    '</div>';
+  let eq=0,peak=0,dd=0;dailyData.forEach(x=>{eq+=x.pnl;peak=Math.max(peak,eq);dd=Math.min(dd,eq-peak)});set("dd",money(dd),cls(dd));
+ $("dailyTable").innerHTML="<table><thead><tr><th>Date</th><th>P&L</th><th>Return %</th><th>Volume</th><th>Fees</th><th>Trades</th><th>W</th><th>L</th></tr></thead><tbody>"+dailyData.map(x=>{let r=cap?x.pnl/cap*100:NaN;return `<tr><td>${esc(x.date)}</td><td class="${cls(x.pnl)}">${money(x.pnl)}</td><td class="${cls(r)}">${pct(r)}</td><td>${money(x.volume)}</td><td>${money(x.fees)}</td><td>${x.trades}</td><td class="green">${x.w}</td><td class="red">${x.l}</td></tr>`}).join("")+"</tbody></table>";
+ let ss=["Long","Short"].map(s=>{let a=closed.filter(r=>r._side==s),p=a.reduce((x,r)=>x+r._pnl,0);return `<tr><td>${s}</td><td>${a.length}</td><td>${a.filter(r=>r._pnl>0).length}</td><td class="${cls(p)}">${money(p)}</td></tr>`}).join("");
+ $("sideTable").innerHTML='<table><thead><tr><th>Side</th><th>Trades</th><th>Wins</th><th>P&L</th></tr></thead><tbody>'+ss+"</tbody></table>";
+ let co={};closed.forEach(r=>{let k=r.coin||"Unknown";co[k]??={n:0,p:0,w:0};co[k].n++;co[k].p+=r._pnl;if(r._pnl>0)co[k].w++});let cr=Object.entries(co).sort((a,b)=>b[1].p-a[1].p);
+ $("coinTable").innerHTML='<table><thead><tr><th>Coin</th><th>Trades</th><th>Wins</th><th>P&L</th></tr></thead><tbody>'+cr.map(([k,x])=>`<tr><td>${esc(k)}</td><td>${x.n}</td><td>${x.w}</td><td class="${cls(x.p)}">${money(x.p)}</td></tr>`).join("")+"</tbody></table>";
+ charts()
+}
+function plot(cv,data,title,bars=false){
+ let z=cv.getBoundingClientRect(),d=devicePixelRatio||1,W=z.width,H=z.height;cv.width=W*d;cv.height=H*d;let c=cv.getContext("2d");c.scale(d,d);c.clearRect(0,0,W,H);c.fillStyle="#8fa0b8";c.font="12px system-ui";c.fillText(title,8,16);if(!data.length)return;
+ let mn=Math.min(0,...data),mx=Math.max(0,...data),rg=mx-mn||1,L=45,R=10,T=28,B=25,x=i=>L+(W-L-R)*(data.length==1?.5:i/(data.length-1)),y=v=>T+(H-T-B)*(1-(v-mn)/rg),zero=y(0);
+ c.strokeStyle="#263247";[mn,0,mx].forEach(v=>{c.beginPath();c.moveTo(L,y(v));c.lineTo(W-R,y(v));c.stroke();c.fillText(v.toFixed(2),3,y(v)+4)});
+ if(bars){let bw=Math.max(2,(W-L-R)/data.length*.65);data.forEach((v,i)=>{c.fillStyle=v>=0?"#28c76f":"#ff5b6e";c.fillRect(x(i)-bw/2,Math.min(zero,y(v)),bw,Math.max(1,Math.abs(y(v)-zero)))})}
+ else{c.strokeStyle="#5aa9ff";c.lineWidth=2;c.beginPath();data.forEach((v,i)=>i?c.lineTo(x(i),y(v)):c.moveTo(x(i),y(v)));c.stroke()}
+}
+function charts(){let q=0;plot($("cum"),dailyData.map(x=>q+=x.pnl),"Cumulative P&L");plot($("daily"),dailyData.map(x=>x.pnl),"Daily P&L",true)}
+function monthlyDataCount(){let s=new Set(rows.map(r=>r._date.getFullYear()+"-"+String(r._date.getMonth()+1).padStart(2,"0")));return s.size}
+function load(f){let rd=new FileReader();rd.onload=()=>{try{let raw=parseCSV(rd.result);if(!raw.length)throw Error("CSV is empty.");let keys=Object.keys(raw[0]);if(!keys.includes("time"))throw Error("Missing required column: time");if(!keys.includes("closedpnl"))throw Error("Missing required column: closedPnl");build(raw);render();status(`Loaded ${f.name}: ${rows.length} rows across ${dailyData.length} day(s).`,"ok")}catch(e){status(e.message,"err")}};rd.onerror=()=>status("Could not read the CSV file.","err");rd.readAsText(f)}
+$("file").onchange=e=>{if(e.target.files[0])load(e.target.files[0])};
+$("drop").ondragover=e=>e.preventDefault();$("drop").ondrop=e=>{e.preventDefault();if(e.dataTransfer.files[0])load(e.dataTransfer.files[0])};
+
+async function autoLoadTradeHistory(){
+  try{
+    const res=await fetch("./trade_history.csv",{cache:"no-store"});
+    if(!res.ok)throw Error("trade_history.csv not found");
+    const text=await res.text();
+    const raw=parseCSV(text);
+    if(!raw.length)throw Error("trade_history.csv is empty.");
+    const keys=Object.keys(raw[0]);
+    if(!keys.includes("time"))throw Error("Missing required column: time");
+    if(!keys.includes("closedpnl"))throw Error("Missing required column: closedPnl");
+    build(raw);
+    render();
+    status(`Automatically loaded trade_history.csv: ${rows.length} rows across ${dailyData.length} day(s).`,"ok");
+  }catch(e){
+    // Automatic loading requires the HTML and CSV to be served from the same directory.
+    // If unavailable, the normal file picker/drop zone remains available.
+  }
+}
+
+$("reset").onclick=()=>location.reload();
+window.onresize=()=>rows.length&&charts();
+charts();
+autoLoadTradeHistory();
+</script></body></html>
