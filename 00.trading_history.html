@@ -26,7 +26,12 @@
 @media(max-width:450px){.month-grid{grid-template-columns:1fr}}
 
 @media(max-width:1050px){.grid{grid-template-columns:repeat(3,1fr)}.charts,.two{grid-template-columns:1fr}}@media(max-width:600px){.grid{grid-template-columns:repeat(2,1fr)}.wrap{padding:10px}}
-</style></head>
+</style>
+<script>
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
 <body><div class="wrap">
 <div class="top"><div><h1>Trading History Dashboard</h1><div class="sub">CSV is processed locally in your browser.</div></div>
 <div class="controls"><input id="file" type="file" accept=".csv,text/csv"><input id="capital" type="number" min="0" step=".01" placeholder="Starting capital"><button id="reset">Reset</button><div id="drop" class="drop">Drop CSV here</div></div></div>
