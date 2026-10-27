@@ -1,0 +1,11 @@
+# TwoRuleTrader (2RT) — Spartan Smart Fund
+A trading and DeFi analytics platform by Damian (SpartanG / Argentina UTC-3).
+Provides: BTC gamma levels (Deribit), Power Law quantiles, DeFi yield screening (Pendle/Morpho), altcoin revenue reports.
+Agent profiles: Jane (#3331, DeFi), Jhon (#3332 BTC specialist), Cyndi (crypto daily specialist).
+Key endpoints/resources:
+- BTC gamma refresh: /home/damian/refresh_gamma_levels.py BTC --levels 200 --distance 0.25
+- Daily report engine: /home/damian/.hermes/scripts/spartan_btc_daily.py
+- Jane top 10: /home/damian/jane_top10_report.py --mode revenue
+- Skills: /home/damian/.hermes/skills/data-science/
+- Data sources: Deribit (gamma), Binance (price/volume), DeFiLlama (revenue), CoinGecko (market data)
+Contact / identity: XLayer wallet 0xbd5... (ASP#2955), profile damian.
