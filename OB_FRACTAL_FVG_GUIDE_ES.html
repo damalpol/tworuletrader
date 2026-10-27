@@ -46,6 +46,10 @@
         .divider { height: 1px; background: var(--border); margin: 20px 0; }
         .footer { text-align: center; color: var(--gray); padding: 20px; font-size: 0.85em; }
     </style>
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
     <header>
@@ -160,7 +164,7 @@
             <li><strong>Filtro de Acuerdo OBV:</strong> El delta sintético debe estar de acuerdo con la dirección real del cierre antes de la clasificación BULL/BEAR — previene falsas señales de divergencia flujo/precio.</li>
             <li><strong>Escala Winsorizada de Tabla:</strong> Normalización al percentil 95 previene que una barra atípica opaque la intensidad de color de toda la tabla.</li>
             <li><strong>Tabla por Barra:</strong> Muestra Hora, Delta Neto, Vol Buy, Vol Sell y palabra de acción para las últimas N barras (configurable, por defecto 20).</li>
-            <li><strong>Flechas de Absorción:</strong> Triángulos azules hacia arriba (abajo) para ABSb, triángulos naranjas hacia abajo (arriba) para ABSs — señales visuales de absorción directamente en el pane CVD.</li>
+            <li><strong>Flechas de Absorción:</strong> Triángulos azules hacia arriba (abajo) para ABSb, triángulos naranjas hacia abajo (arriba) para ABSs �� señales visuales de absorción directamente en el pane CVD.</li>
             <li><strong>Puerta de Calidad de Wick:</strong> Umbral de wick configurable (por defecto 60%) rechaza barras con wicks excesivos que podrían invalidar la señal.</li>
             <li><strong>Acumulación Solo Confirmada:</strong> El total CVD solo se acumula en barras <code>barstate.isconfirmed</code>, evitando ruido en tiempo real.</li>
             <li><strong>EMA de Momentum CVD:</strong> EMA de 20 períodos del delta representada como gráfico de área — muestra dirección y fuerza del momentum de flujo a corto plazo.</li>
