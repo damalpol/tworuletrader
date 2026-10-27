@@ -1,0 +1,19 @@
+{
+  "name": "tworuletrader",
+  "version": "1.0.0",
+  "description": "SMC Structure V7 — Professional Market Structure Trading System",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "smc",
+    "trading",
+    "market-structure"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
